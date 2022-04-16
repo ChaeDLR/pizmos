@@ -1,35 +1,6 @@
-from dataclasses import dataclass
 from random import randint
 from pygame import Vector2
-
-
-@dataclass
-class Particle:
-
-    color: list[int, int, int, int]
-    center: Vector2
-    slope: tuple[int, int]
-    radius: float
-
-    def __post_init__(self):
-        self.__dissipation_rate: float = 5 / self.radius
-
-    @property
-    def alpha(self) -> int:
-        return self.color[3]
-
-    @alpha.setter
-    def alpha(self, value: float) -> None:
-        if value < 20: self.color[3] = 0
-        elif value > 255: self.color[3] = 255
-        else: self.color[3] = value
-
-    def update(self) -> None:
-        """update the particles values"""
-        self.center.x += self.slope[0]
-        self.center.y += self.slope[1]
-
-        self.alpha -= self.__dissipation_rate
+from .particle import Particle
 
 def explosion(start_position: tuple[int, int]) -> list[Particle]:
     """
@@ -50,7 +21,9 @@ def explosion(start_position: tuple[int, int]) -> list[Particle]:
     )
 
     colors = [
-        [randint(20, 230), randint(20, 230), randint(20, 230), 255] for _ in range(4)
+        [
+            randint(20, 230), randint(20, 230), randint(20, 230), 255
+        ] for _ in range(4)
     ]
 
     velocity: int = 20
@@ -73,7 +46,7 @@ def explosion(start_position: tuple[int, int]) -> list[Particle]:
                         (direction[0] * velocity) * roc_percentage,
                         (direction[1] * velocity) * roc_percentage,
                     ),
-                    radius=radius,
+                    radius=i,
                 )
             )
 
