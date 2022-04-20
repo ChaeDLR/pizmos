@@ -96,6 +96,20 @@ def get_images_at(
             for rect in rectangles
         ]
 
+def get_surfcolors(img: pygame.Surface) -> tuple:
+        """
+        Loop through a surface and grab the colors its made of
+        sort from lightest(n) to darkest(0)
+        """
+        colors: list = []
+        for row in pygame.surfarray.array3d(img):
+            for pixel in row:
+                rgb: list = [int(pixel[0]), int(pixel[1]), int(pixel[2]), 255]
+                if rgb not in [[255, 255, 255, 255], [0, 0, 0, 255]] + colors:
+                    colors.append(rgb)
+        colors.sort(key=sum)
+        return tuple(colors)
+
 def get_subimages(image: pygame.Surface, size: tuple=None) -> list[pygame.Surface]:
     """
     return a list of surfaces from the given surface
