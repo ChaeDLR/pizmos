@@ -2,11 +2,6 @@ import pygame
 import os
 
 from sys import exc_info
-from pygame.constants import (
-    BLEND_ALPHA_SDL2, SCALED, SRCALPHA,
-    KEYDOWN, MOUSEBUTTONDOWN, QUIT,
-    K_ESCAPE, K_SPACE, K_b, K_c
-)
 
 
 def load(path: str) -> dict:
@@ -22,7 +17,7 @@ def load(path: str) -> dict:
 
             try:
                 img: pygame.Surface = None
-                str_parts: List[str] = None
+                str_parts: list[str] = None
                 for file in os.listdir(path):
                     if file[len(file) - 4 :] == ".png":
                         img = pygame.transform.scale(
@@ -41,14 +36,12 @@ def load(path: str) -> dict:
                     else:
                         if prev_key:
                             load(
-                                cls,
                                 os.path.abspath(os.path.join(path, file)),
                                 imgs_dict[prev_key],
                                 file,
                             )
                         else:
                             load(
-                                cls,
                                 os.path.abspath(os.path.join(path, file)),
                                 imgs_dict,
                                 file,
@@ -88,7 +81,7 @@ def get_images_at(
         colorkey: tuple[int, int, int]=None,
         scale: tuple[int, int]=None,
     ) -> list[pygame.Surface]:
-        """Load a whole numch of images from a single file and return them as a list"""
+        """Load images from a single file and return them as a list"""
         if not scale:
             return [get_image_at(rect, filepath, colorkey) for rect in rectangles]
         return [
@@ -101,12 +94,19 @@ def get_surfcolors(img: pygame.Surface) -> tuple:
         Loop through a surface and grab the colors its made of
         sort from lightest(n) to darkest(0)
         """
-        colors: list = []
+        excluded = [
+            [255, 255, 255, 255], 
+            [0, 0, 0, 255],
+        ]
+        if _cc := img.get_colorkey(): excluded.append(list(_cc))
+
+        colors = list()
+        pixel_color = list()
         for row in pygame.surfarray.array3d(img):
             for pixel in row:
-                rgb: list = [int(pixel[0]), int(pixel[1]), int(pixel[2]), 255]
-                if rgb not in [[255, 255, 255, 255], [0, 0, 0, 255]] + colors:
-                    colors.append(rgb)
+                pixel_color = [int(pixel[0]), int(pixel[1]), int(pixel[2]), 255]
+                if pixel_color not in excluded + colors:
+                    colors.append(pixel_color)
         colors.sort(key=sum)
         return tuple(colors)
 
@@ -125,7 +125,7 @@ def get_subimages(image: pygame.Surface, size: tuple=None) -> list[pygame.Surfac
         (
             pygame.Surface(
                 _rect.size,
-                flags=BLEND_ALPHA_SDL2,
+                flags=pygame.BLEND_ALPHA_SDL2,
             ),
             _rect,
         )
@@ -154,7 +154,7 @@ def trim(image: pygame.Surface) -> tuple[pygame.Surface, pygame.rect.Rect]:
     _img = image
     _mask: pygame.mask.Mask = pygame.mask.from_surface(_img)
     _rect: pygame.rect.Rect = _mask.get_bounding_rects()[0]
-    image = pygame.Surface(_rect.size, flags=BLEND_ALPHA_SDL2)
+    image = pygame.Surface(_rect.size, flags=pygame.BLEND_ALPHA_SDL2)
     image.blit(_img, (0, 0), area=_rect)
     image.set_colorkey(image.get_at((0, 0)))
     return (image, pygame.rect)
