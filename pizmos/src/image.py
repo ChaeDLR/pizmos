@@ -6,7 +6,7 @@ from sys import exc_info
 
 def load(path: str) -> dict:
         """
-        Recursive method that returns a directory
+        Recursive function that returns a directory
         with all the images in the path arg directory
         """
         def __load(imgs_dict: dict, prev_key: str=None) -> dict:
@@ -56,38 +56,15 @@ def load(path: str) -> dict:
             return imgs_dict
         return __load({})
 
-def get_image_at(
+def from_image_file(
         rectangle: tuple[int, int, int, int],
         filepath: str,
-        colorkey: tuple[int, int, int]=None,
-        scale: tuple[int, int]=None,
     ) -> pygame.Surface:
         """Load a rectangle"""
         # Loads image from x, y, x+offset, y+offset
-        rect = pygame.Rect(rectangle)
-        image = pygame.Surface(rect.size).convert()
-        image.blit(pygame.image.load(filepath), (0, 0), rect)
-        if colorkey:
-            if colorkey == -1:
-                colorkey = image.get_at((0, 0))
-            image.set_colorkey(colorkey, pygame.RLEACCEL)
-        if scale:
-            return pygame.transform.scale(image, scale)
+        image = pygame.Surface(rectangle[:2]).convert()
+        image.blit(pygame.image.load(filepath), (0, 0), rectangle)
         return image
-
-def get_images_at(
-        rectangles: tuple[int, int, int, int],
-        filepath: str,
-        colorkey: tuple[int, int, int]=None,
-        scale: tuple[int, int]=None,
-    ) -> list[pygame.Surface]:
-        """Load images from a single file and return them as a list"""
-        if not scale:
-            return [get_image_at(rect, filepath, colorkey) for rect in rectangles]
-        return [
-            pygame.transform.scale(get_image_at(rect, filepath, colorkey), scale)
-            for rect in rectangles
-        ]
 
 def get_surfcolors(img: pygame.Surface) -> tuple:
         """
@@ -95,7 +72,7 @@ def get_surfcolors(img: pygame.Surface) -> tuple:
         sort from lightest(n) to darkest(0)
         """
         excluded = [
-            [255, 255, 255, 255], 
+            [255, 255, 255, 255],
             [0, 0, 0, 255],
         ]
         if _cc := img.get_colorkey(): excluded.append(list(_cc))
@@ -180,6 +157,10 @@ def slicendice(
             new_button.set_colorkey(new_button.get_at((0, 0)))
             cut_buttons.append(new_button)
     return cut_buttons
+
+def generate_surface(size: tuple[int, int]) -> pygame.Surface:
+    # TODO: make square with random rect algorithm
+    surf = pygame.Surface(size, flags=pygame.BLEND_ALPHA_SDL2 | pygame.SRCALPHA)
 
 
 class Image:

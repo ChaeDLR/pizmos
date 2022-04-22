@@ -2,6 +2,7 @@ import pygame
 import pizmos
 
 from sys import exit
+from tests import rec_result
 
 def __launch_window() -> None:
     pygame.display.init()
@@ -33,10 +34,6 @@ def __launch_window() -> None:
                         pizmos.particles.explosion(start_position=event.pos)
                     )
 
-            elif event.type == pygame.KEYDOWN:
-                surf_colors = pizmos.image.get_surfcolors(testimage.image)
-                print(surf_colors)
-
         ####### update and draw #######
         if 0 < len(live_particles):
 
@@ -55,6 +52,36 @@ def __launch_window() -> None:
                     )
 
         pygame.display.update()
+
+def from_image_file(func: callable, _case=[]) -> tuple[int, int]:
+    """
+    (rectangle, filepath) -> Surface
+    """
+    pass
+
+def get_surfcolors(func: callable, _case=[]) -> tuple[int, int]:
+    """
+    (Surface) -> tuple
+    """
+    pass
+
+def get_subimages(func: callable, _case=[]) -> tuple[int, int]:
+    """
+    (Surface, size) -> list[Surface]
+    """
+    pass
+
+def trim(func: callable, _case=[]) -> tuple[int, int]:
+    """
+    (Surface) -> tuple[Surface, Rect]
+    """
+    pass
+
+def slicendice(func: callable, _case=[]) -> tuple[int, int]:
+    """
+    (Surface, grid: tuple[int, int], margins: tuple) -> list[Surface]
+    """
+    pass
 
 if __name__ == "__main__":
     testimage = pizmos.image.Image(pygame.Surface((32, 32)))
