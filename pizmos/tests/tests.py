@@ -1,4 +1,14 @@
+import sys
 from typing import Callable
+
+try:
+    from pizmos import (
+        image, math, io
+    )
+except ModuleNotFoundError:
+    from .pizmos import (
+        image, math, io
+    )
 
 
 def rec_result(test_method: Callable) -> tuple[int, int]:
@@ -32,3 +42,22 @@ def rec_result(test_method: Callable) -> tuple[int, int]:
         return (passes, fails)
 
     return test_callable
+
+def exe(test: str, options: list[str]=[]) -> None:
+    """Execute all tests unless a test is specified"""
+    pass
+
+def run() -> None:
+    print("Running!")
+
+if __name__ == "__main__":
+    _tests = {
+        "generate_surface": image.generate_surface,
+        "get_surfcolors": image.get_surfcolors
+    }
+    # if sys.argv[1] in _tests:
+    #     exe(sys.argv[1], )
+    # else:
+    #     raise f"/nError: {sys.argv[1]} is an invalid test"
+
+    print(sys.argv)

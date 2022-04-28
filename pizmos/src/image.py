@@ -1,93 +1,23 @@
 import pygame
-import os
 
-from sys import exc_info
+from secrets import randbelow
 
 
-def load(path: str) -> dict:
-        """
-        Recursive function that returns a directory
-        with all the images in the path arg directory
-        """
-        def __load(imgs_dict: dict, prev_key: str=None) -> dict:
-            if prev_key:
-                imgs_dict[prev_key] = {}
-            _size: tuple = (64, 64)
-            _imgs: list = []
-
-            try:
-                img: pygame.Surface = None
-                str_parts: list[str] = None
-                for file in os.listdir(path):
-                    if file[len(file) - 4 :] == ".png":
-                        img = pygame.transform.scale(
-                            pygame.image.load(os.path.join(path, file)).convert_alpha(),
-                            _size,
-                        )
-                        img.set_colorkey(img.get_at((0,0)))
-
-                        if file[:-4].isdigit():
-                            _imgs.append(img)
-                        else:
-                            # single .pngs with their key in the title
-                            str_parts = file[:-4].split("_")
-                            imgs_dict[str_parts[0]] = img
-
-                    else:
-                        if prev_key:
-                            load(
-                                os.path.abspath(os.path.join(path, file)),
-                                imgs_dict[prev_key],
-                                file,
-                            )
-                        else:
-                            load(
-                                os.path.abspath(os.path.join(path, file)),
-                                imgs_dict,
-                                file,
-                            )
-            except NotADirectoryError as ex:
-                print(f"{ex.filename} not an accepted file type.")
-                raise ex.with_traceback(exc_info())
-
-            if len(_imgs) > 0:
-                imgs_dict[prev_key] = _imgs
-
-            return imgs_dict
-        return __load({})
-
-def from_image_file(
+def get_subimage(
         rectangle: tuple[int, int, int, int],
         filepath: str,
     ) -> pygame.Surface:
-        """Load a rectangle"""
-        # Loads image from x, y, x+offset, y+offset
-        image = pygame.Surface(rectangle[:2]).convert()
+        """
+        returns a subimage of the given rect 
+        """
+        image = pygame.Surface(
+            rectangle[:2], 
+            flags=pygame.BLEND_ALPHA_SDL2 | pygame.SRCALPHA
+        )
         image.blit(pygame.image.load(filepath), (0, 0), rectangle)
         return image
 
-def get_surfcolors(img: pygame.Surface) -> tuple:
-        """
-        Loop through a surface and grab the colors its made of
-        sort from lightest(n) to darkest(0)
-        """
-        excluded = [
-            [255, 255, 255, 255],
-            [0, 0, 0, 255],
-        ]
-        if _cc := img.get_colorkey(): excluded.append(list(_cc))
-
-        colors = list()
-        pixel_color = list()
-        for row in pygame.surfarray.array3d(img):
-            for pixel in row:
-                pixel_color = [int(pixel[0]), int(pixel[1]), int(pixel[2]), 255]
-                if pixel_color not in excluded + colors:
-                    colors.append(pixel_color)
-        colors.sort(key=sum)
-        return tuple(colors)
-
-def get_subimages(image: pygame.Surface, size: tuple=None) -> list[pygame.Surface]:
+def get_subimages(image: pygame.Surface) -> list[pygame.Surface]:
     """
     return a list of surfaces from the given surface
     divided by the color at (0,0)
@@ -95,34 +25,21 @@ def get_subimages(image: pygame.Surface, size: tuple=None) -> list[pygame.Surfac
     _img = image
     _colorkey = _img.get_at((0, 0))
     _mask = pygame.mask.from_surface(_img, threshold=174)
-    _rects = _mask.get_bounding_rects()
-
     _images = list()
+
     for (surf, rect) in [
         (
             pygame.Surface(
                 _rect.size,
-                flags=pygame.BLEND_ALPHA_SDL2,
+                flags=pygame.BLEND_ALPHA_SDL2 | pygame.SRCALPHA,
             ),
             _rect,
-        )
-        for _rect in _rects
+        ) for _rect in _mask.get_bounding_rects()
     ]:
         surf.blit(_img, (0, 0), area=rect)
         surf.set_colorkey(_colorkey)
         _images.append(surf)
-
-    try:
-        return list(
-            map(
-                pygame.transform.scale,
-                [_img for _img in _images],
-                [size for _ in range(len(_images))],
-            )
-        )
-    except:
-        return _images
-
+    return _images
 
 def trim(image: pygame.Surface) -> tuple[pygame.Surface, pygame.rect.Rect]:
     """
@@ -159,57 +76,43 @@ def slicendice(
     return cut_buttons
 
 def generate_surface(size: tuple[int, int]) -> pygame.Surface:
-    # TODO: make square with random rect algorithm
+    """
+    Generate a surface with random rects filled with random colors
+    """
     surf = pygame.Surface(size, flags=pygame.BLEND_ALPHA_SDL2 | pygame.SRCALPHA)
+    initial_rect: tuple = (0, 0, randbelow(size[0]), randbelow(size[1]))
 
+    wside = list()
+    hside = list()
+    c_w, c_h = initial_rect[2], initial_rect[3]
 
-class Image:
-    name: str = ""
-    next: "Image" = None
+    while c_w != size[0]:
+        offset_w = size[0] - c_w
+        offset_h = size[1] - c_h
+        n_w = randbelow(offset_w)
+        wside.append(
+            (c_w, c_h, n_w, randbelow(offset_h))
+        )
+        c_w += n_w
+    print(wside)
 
-    __image: pygame.Surface = None
-    __rect: pygame.Rect = None
+def get_surfcolors(img: pygame.Surface) -> tuple:
+        """
+        Loop through a surface and grab the colors its made of
+        sort from lightest(n) to darkest(0)
+        """
+        excluded = [
+            [255, 255, 255, 255],
+            [0, 0, 0, 255],
+        ]
+        if _cc := img.get_colorkey(): excluded.append(list(_cc))
 
-    def __init__(
-        self, surface: pygame.Surface, pos: tuple[int, int] = (0, 0), **kwargs
-    ) -> None:
-        self.image = surface
-        self.rect = self.image.get_rect(center=pos)
-
-        for key in kwargs:
-            try:
-                self.__setattr__(key, kwargs[key])
-            except ValueError:
-                print(f"Failed to set attr {key}: {kwargs[key]}")
-
-    @property
-    def image(self) -> pygame.Surface:
-        return self.__image
-
-    @image.setter
-    def image(self, value: pygame.Surface) -> None:
-        if isinstance(value, pygame.Surface):
-            self.__image = value
-            if self.__rect:
-                self.__rect = value.get_rect(center=self.__rect.center)
-        else:
-            raise ValueError(f"{value} must be an instance of pygame.Surface.")
-
-    @property
-    def rect(self) -> pygame.Rect:
-        return self.__rect
-
-    @rect.setter
-    def rect(self, value: pygame.Rect) -> None:
-        if isinstance(value, pygame.Rect):
-            self.__rect = value
-        else:
-            raise ValueError(f"{value} must be an instance of pygame.Rect.")
-
-    def resize(self, w_h: tuple[int, int]) -> None:
-        self.image = pygame.transform.scale(self.image, w_h)
-        self.rect = self.image.get_rect()
-
-    def set_position(self, x_y: tuple[int, int]) -> None:
-        """set using rect center"""
-        self.rect.center = x_y
+        colors = list()
+        pixel_color = list()
+        for row in pygame.surfarray.array3d(img):
+            for pixel in row:
+                pixel_color = [int(pixel[0]), int(pixel[1]), int(pixel[2]), 255]
+                if pixel_color not in excluded + colors:
+                    colors.append(pixel_color)
+        colors.sort(key=sum)
+        return tuple(colors)

@@ -84,5 +84,4 @@ def slicendice(func: callable, _case=[]) -> tuple[int, int]:
     pass
 
 if __name__ == "__main__":
-    testimage = pizmos.image.Image(pygame.Surface((32, 32)))
-    testimage.image.fill((120, 120, 120, 255))
+    pizmos.image.generate_surface((1080, 720))
