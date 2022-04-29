@@ -1,8 +1,8 @@
 import pygame
 import pizmos
 
-from sys import exit
-from tests import rec_result
+from sys import exit, exc_info
+
 
 def __launch_window() -> None:
     pygame.display.init()
@@ -53,6 +53,7 @@ def __launch_window() -> None:
 
         pygame.display.update()
 
+
 def from_image_file(func: callable, _case=[]) -> tuple[int, int]:
     """
     (rectangle, filepath) -> Surface
@@ -63,7 +64,17 @@ def get_surfcolors(func: callable, _case=[]) -> tuple[int, int]:
     """
     (Surface) -> tuple
     """
-    pass
+    print("Testing image.get_surfacecolor()...")
+    try:
+        testSurf = pygame.Surface(
+                (480, 320),
+                flags=pygame.BLEND_ALPHA_SDL2 | pygame.SRCALPHA
+            )
+        testSurf.fill((120, 230, 200, 255))
+        func(testSurf)
+    except TypeError as ex:
+       print("\nInvalid argument passed to test method.\n")
+       raise ex.with_traceback(exc_info()[2].tb_next)
 
 def get_subimages(func: callable, _case=[]) -> tuple[int, int]:
     """
@@ -75,6 +86,7 @@ def trim(func: callable, _case=[]) -> tuple[int, int]:
     """
     (Surface) -> tuple[Surface, Rect]
     """
+    print("trim")
     pass
 
 def slicendice(func: callable, _case=[]) -> tuple[int, int]:

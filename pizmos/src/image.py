@@ -105,7 +105,10 @@ def get_surfcolors(img: pygame.Surface) -> tuple:
             [255, 255, 255, 255],
             [0, 0, 0, 255],
         ]
-        if _cc := img.get_colorkey(): excluded.append(list(_cc))
+        try:
+            if _cc := img.get_colorkey(): excluded.append(list(_cc))
+        except AttributeError:
+            raise TypeError
 
         colors = list()
         pixel_color = list()
