@@ -2,6 +2,7 @@ import pygame
 import pizmos
 
 from sys import exit, exc_info
+from typing import Callable, Iterable
 
 
 def __launch_window() -> None:
@@ -36,9 +37,7 @@ def __launch_window() -> None:
 
         ####### update and draw #######
         if 0 < len(live_particles):
-
             for particle in live_particles:
-
                 particle.update()
 
                 if particle.alpha == 0:
@@ -50,17 +49,22 @@ def __launch_window() -> None:
                         center=particle.center,
                         radius=particle.radius,
                     )
-
         pygame.display.update()
 
 
-def from_image_file(func: callable, _case=[]) -> tuple[int, int]:
+def from_image_file(
+            func: Callable[[Iterable, str], pygame.Surface],
+            _case=[]
+        ) -> tuple[int, int]:
     """
     (rectangle, filepath) -> Surface
     """
     pass
 
-def get_surfcolors(func: callable, _case=[]) -> tuple[int, int]:
+def get_surfcolors(
+            func: Callable[[pygame.Surface], tuple],
+            _case=[]
+        ) -> tuple[int, int]:
     """
     (Surface) -> tuple
     """
@@ -76,24 +80,33 @@ def get_surfcolors(func: callable, _case=[]) -> tuple[int, int]:
        print("\nInvalid argument passed to test method.\n")
        raise ex.with_traceback(exc_info()[2].tb_next)
 
-def get_subimages(func: callable, _case=[]) -> tuple[int, int]:
+def get_subimages(
+            func: Callable[[pygame.Surface, Iterable],
+            list[pygame.Surface]],
+            _case=[]
+        ) -> tuple[int, int]:
     """
     (Surface, size) -> list[Surface]
     """
     pass
 
-def trim(func: callable, _case=[]) -> tuple[int, int]:
+def trim(
+            func: Callable[[pygame.Surface],
+            tuple[pygame.Surface, pygame.Rect]],
+            _case=[]
+        ) -> tuple[int, int]:
     """
     (Surface) -> tuple[Surface, Rect]
     """
     print("trim")
     pass
 
-def slicendice(func: callable, _case=[]) -> tuple[int, int]:
+def slicendice(
+                func: Callable[[pygame.Surface, Iterable, Iterable],
+                list[pygame.Surface]],
+                _case=[]
+            ) -> tuple[int, int]:
     """
     (Surface, grid: tuple[int, int], margins: tuple) -> list[Surface]
     """
     pass
-
-if __name__ == "__main__":
-    pizmos.image.generate_surface((1080, 720))

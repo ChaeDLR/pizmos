@@ -1,5 +1,7 @@
 import pygame
 
+from sys import maxsize
+from typing import Iterable
 from secrets import randbelow
 
 
@@ -24,7 +26,7 @@ def get_subimages(image: pygame.Surface) -> list[pygame.Surface]:
     """
     _img = image
     _colorkey = _img.get_at((0, 0))
-    _mask = pygame.mask.from_surface(_img, threshold=174)
+    _mask = pygame.mask.from_surface(_img, threshold=174) # test threshhold
     _images = list()
 
     for (surf, rect) in [
@@ -46,7 +48,7 @@ def trim(image: pygame.Surface) -> tuple[pygame.Surface, pygame.rect.Rect]:
     Remove as much of the colorkey as possible
     """
     _img = image
-    _mask: pygame.mask.Mask = pygame.mask.from_surface(_img)
+    _mask: pygame.mask.Mask = pygame.mask.from_surface(_img) # test threshhold
     _rect: pygame.rect.Rect = _mask.get_bounding_rects()[0]
     image = pygame.Surface(_rect.size, flags=pygame.BLEND_ALPHA_SDL2)
     image.blit(_img, (0, 0), area=_rect)
@@ -75,36 +77,15 @@ def slicendice(
             cut_buttons.append(new_button)
     return cut_buttons
 
-def generate_surface(size: tuple[int, int]) -> pygame.Surface:
-    """
-    Generate a surface with random rects filled with random colors
-    """
-    surf = pygame.Surface(size, flags=pygame.BLEND_ALPHA_SDL2 | pygame.SRCALPHA)
-    initial_rect: tuple = (0, 0, randbelow(size[0]), randbelow(size[1]))
-
-    wside = list()
-    hside = list()
-    c_w, c_h = initial_rect[2], initial_rect[3]
-
-    while c_w != size[0]:
-        offset_w = size[0] - c_w
-        offset_h = size[1] - c_h
-        n_w = randbelow(offset_w)
-        wside.append(
-            (c_w, c_h, n_w, randbelow(offset_h))
-        )
-        c_w += n_w
-    print(wside)
-
 def get_surfcolors(img: pygame.Surface) -> tuple:
         """
         Loop through a surface and grab the colors its made of
         sort from lightest(n) to darkest(0)
         """
         excluded = [
-            [255, 255, 255, 255],
-            [0, 0, 0, 255],
-        ]
+                [255, 255, 255, 255],
+                [0, 0, 0, 255],
+            ]
         try:
             if _cc := img.get_colorkey(): excluded.append(list(_cc))
         except AttributeError:
@@ -119,3 +100,20 @@ def get_surfcolors(img: pygame.Surface) -> tuple:
                     colors.append(pixel_color)
         colors.sort(key=sum)
         return tuple(colors)
+
+def generate_surface(size: Iterable) -> pygame.Surface:
+    """
+    Generate a surface with random rects filled with random colors
+    """
+    w, h = (
+        size[0]//2 if size[0] > 1 else 1,
+        size[1]//2 if size[1] > 1 else 1
+    )
+
+    if not 0 < (w and h) < maxsize:
+        raise ValueError("\nWidth and height need to be greater than 1.\n")
+
+    surf = pygame.Surface(size, flags=pygame.BLEND_ALPHA_SDL2 | pygame.SRCALPHA)
+    initial_rect: tuple = (0, 0, randbelow(size[0]), randbelow(size[1]))
+
+    print(f"\nWidth = {w}, Height = {h}\n")
