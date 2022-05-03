@@ -3,6 +3,7 @@ import pizmos
 
 from sys import exit, exc_info
 from typing import Callable, Iterable
+from secrets import randbelow
 
 
 def __launch_window() -> None:
@@ -70,11 +71,23 @@ def get_surfcolors(
     """
     print("Testing image.get_surfacecolor()...")
     try:
+        _x, _y = 480, 320
+        _w = _x/4
+        _h = _y/4
+
         testSurf = pygame.Surface(
-                (480, 320),
+                (_w, _h),
                 flags=pygame.BLEND_ALPHA_SDL2 | pygame.SRCALPHA
             )
-        testSurf.fill((120, 230, 200, 255))
+
+        # TODO: map
+        for i in range(4):
+            for j in range(4):
+                testSurf.fill(
+                        color=(randbelow(256), randbelow(256), randbelow(256), 255),
+                        rect=(_x*i, _y*j, _w, _h)
+                    )
+
         func(testSurf)
     except TypeError as ex:
        print("\nInvalid argument passed to test method.\n")
