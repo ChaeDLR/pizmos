@@ -105,15 +105,26 @@ def generate_surface(size: Iterable) -> pygame.Surface:
     """
     Generate a surface with random rects filled with random colors
     """
-    w, h = (
-        size[0]//2 if size[0] > 1 else 1,
-        size[1]//2 if size[1] > 1 else 1
-    )
-
-    if not 0 < (w and h) < maxsize:
-        raise ValueError("\nWidth and height need to be greater than 1.\n")
-
     surf = pygame.Surface(size, flags=pygame.BLEND_ALPHA_SDL2 | pygame.SRCALPHA)
+    w, h = (
+            size[0]//2 if size[0] > 1 else 1,
+            size[1]//2 if size[1] > 1 else 1
+        )
+
+    if not 1 < w < maxsize:
+        if w == 1: 
+            surf.fill(
+                    (randbelow(256), randbelow(256), randbelow(256), 255),
+                    (0, 0, w, 1)
+                )
+    if not 1 < h < maxsize:
+        if h == 1:
+            surf.fill(
+                (randbelow(256), randbelow(256), randbelow(256), 255),
+                        (0, 0, 1, h)
+            )
+
     initial_rect: tuple = (0, 0, randbelow(size[0]), randbelow(size[1]))
 
     print(f"\nWidth = {w}, Height = {h}\n")
+     return surf
