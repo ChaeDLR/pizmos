@@ -1,1 +1,3 @@
-from .modules import image
+from . import (
+    image, pixel, utils
+)

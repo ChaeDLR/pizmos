@@ -8,5 +8,5 @@ __license__ = "Lesser General Public License"
 __copyright__ = "Copyright (C) 2022 Chae De La Rosa"
 
 from .src import (
-    image, math, particles, io
+    image, math, particles, io, pixel
 )

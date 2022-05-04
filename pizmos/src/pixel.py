@@ -1,13 +1,14 @@
 import pygame
 
 
-# TODO
-def replace_color(surf: pygame.Surface, new: tuple | list, old: tuple | list=None):
+def replace_color(surf: pygame.Surface, old: tuple | list, new: tuple | list):
     """
     replace a color in an image
     use colorkey if old is none
     """
-    ...
+    if not isinstance(surf, pygame.Surface): raise TypeError
+    for row in pygame.surfarray.array3d(surf):
+        if row == old: row = new
 
 def get_surfcolors(img: pygame.Surface) -> tuple:
         """
@@ -18,6 +19,7 @@ def get_surfcolors(img: pygame.Surface) -> tuple:
                 [255, 255, 255, 255],
                 [0, 0, 0, 255],
             ]
+
         try:
             if _cc := img.get_colorkey(): excluded.append(list(_cc))
         except AttributeError:

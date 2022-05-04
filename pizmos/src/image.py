@@ -1,23 +1,19 @@
 import pygame
 
-from sys import maxsize
-from typing import Iterable
-from secrets import randbelow
-
 
 def get_subimage(
         rectangle: tuple[int, int, int, int],
         filepath: str,
     ) -> pygame.Surface:
-        """
-        returns a subimage of the given rect 
-        """
-        image = pygame.Surface(
-            rectangle[:2], 
-            flags=pygame.BLEND_ALPHA_SDL2 | pygame.SRCALPHA
-        )
-        image.blit(pygame.image.load(filepath), (0, 0), rectangle)
-        return image
+    """
+    returns a subimage of the given rect 
+    """
+    image = pygame.Surface(
+        rectangle[:2], 
+        flags=pygame.BLEND_ALPHA_SDL2 | pygame.SRCALPHA
+    )
+    image.blit(pygame.image.load(filepath), (0, 0), rectangle)
+    return image
 
 def get_subimages(image: pygame.Surface) -> list[pygame.Surface]:
     """
