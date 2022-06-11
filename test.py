@@ -1,25 +1,14 @@
 import sys
-
-try:
-    import pizmos
-    import pygame
-    import pizmos.tests as tests
-
-    print(f"{pizmos.__title__} {pizmos.__version__} (python {sys.version.split(' ')[0]})")
-except ModuleNotFoundError:
-    raise
+import pygame
+import pizmos
+import test
 
 if __name__ == "__main__":
 
-    testsurf = tests.utils.coloredsurf()
-    testrect = testsurf.get_rect()
-    readcolors = [testsurf.get_at(_xy) for _xy in [
-            testrect.topleft, (testrect.width-1, 0),
-            (0, testrect.height-1), (testrect.width-1, testrect.height-1)
-        ]
-    ]
+    # TEST -> get_surfcolors
+    test.pixel.get_surfcolors(pizmos.pixel.get_surfcolors)
 
-    tests.pixel.get_surfcolors(pizmos.pixel.get_surfcolors)
+    testsurf = pizmos.image.coloredsurf()
 
     pygame.display.init()
     idisplay = pygame.display.Info()

@@ -1,9 +1,7 @@
 import pygame
 import pizmos
 
-from sys import exit, exc_info
 from typing import Callable, Iterable
-from secrets import randbelow
 
 
 def __launch_window() -> None:

@@ -11,26 +11,28 @@ def replace_color(surf: pygame.Surface, old: tuple | list, new: tuple | list):
         if row == old: row = new
 
 def get_surfcolors(img: pygame.Surface) -> tuple:
-        """
-        Loop through a surface and grab the colors its made of
-        sort from lightest(n) to darkest(0)
-        """
-        excluded = [
-                [255, 255, 255, 255],
-                [0, 0, 0, 255],
-            ]
+    """
+    Loop through a surface and grab the colors its made of
+    sort from lightest(n) to darkest(0)
+    """
+    if not isinstance(img, pygame.Surface): raise TypeError
 
-        try:
-            if _cc := img.get_colorkey(): excluded.append(list(_cc))
-        except AttributeError:
-            raise TypeError
+    _alpha: int = img.get_alpha()
+    if _alpha == None:
+        _alpha = 255
+    
+    excluded = []
+    if _cc := img.get_colorkey():
+        excluded.append(list(_cc))
 
-        colors = list()
-        pixel_color = list()
-        for row in pygame.surfarray.array3d(img):
-            for pixel in row:
-                pixel_color = [int(pixel[0]), int(pixel[1]), int(pixel[2]), 255]
-                if pixel_color not in excluded + colors:
-                    colors.append(pixel_color)
-        colors.sort(key=sum)
-        return tuple(colors)
+    colors = list()
+    pixel_color = list()
+    for row in pygame.surfarray.array3d(img):
+        for pixel in row:
+            pixel_color = list(pixel)
+            pixel_color.append(_alpha)
+            if pixel_color not in excluded + colors:
+                colors.append(pixel_color)
+
+    colors.sort(key=sum)
+    return tuple(colors)

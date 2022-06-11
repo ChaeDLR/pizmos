@@ -1,5 +1,6 @@
 import pygame
 
+from secrets import randbelow
 
 def get_subimage(
         rectangle: tuple[int, int, int, int],
@@ -72,3 +73,21 @@ def slicendice(
             new_button.set_colorkey(new_button.get_at((0, 0)))
             cut_buttons.append(new_button)
     return cut_buttons
+
+def coloredsurf(size: tuple=(64, 64)) -> pygame.Surface:
+    """
+    Create a surface and fill each corner with a random color
+    """
+    _surf = pygame.Surface(
+            size,
+            flags=pygame.BLEND_ALPHA_SDL2 | pygame.SRCALPHA
+        )
+    _colors = [
+            (randbelow(256), randbelow(256), randbelow(256), (255)) for _ in range(4)
+        ]
+
+    _cw, _ch = size[0]//2, size[1]//2
+    for i in range(2):
+        _surf.fill(_colors.pop(), (_cw*i, 0, _cw, _ch))
+        _surf.fill(_colors.pop(), (_cw*i, _ch, _cw, _ch))
+    return _surf
