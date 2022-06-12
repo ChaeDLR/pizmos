@@ -5,10 +5,15 @@ import test
 
 if __name__ == "__main__":
 
-    # TEST -> get_surfcolors
+    testsurf = pizmos.image.coloredsurf()
+
+    # TEST
+
     test.pixel.get_surfcolors(pizmos.pixel.get_surfcolors)
 
-    testsurf = pizmos.image.coloredsurf()
+    test.pixel.replace_color(pizmos.pixel.replace_color)
+
+    # TEST
 
     pygame.display.init()
     idisplay = pygame.display.Info()

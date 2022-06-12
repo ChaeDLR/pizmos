@@ -1,3 +1,4 @@
+from cgi import test
 import pygame
 import os
 import json
@@ -10,6 +11,20 @@ def replace_color(func: Callable[[pygame.Surface], tuple]) -> tuple[int, int]:
     replace_color(surf: pygame.Surface, old: tuple | list, new: tuple | list)
     """
     if not callable(func): raise TypeError
+
+    testsurf = pygame.Surface((64, 64))
+    testsurf.fill((200, 200, 200, 255))
+
+    old = list(testsurf.get_at((1, 1)))
+    new = [ # check if pixels3d returns an RGBA format
+        255 - old[0],
+        255 - old[1],
+        255 - old[2]
+    ]
+    altered_surf = func(testsurf, old, new)
+    altered_new = altered_surf.get_at((1, 1))
+    new.append(255)
+    assert list(altered_new) == new
 
 def get_surfcolors(func: Callable[[pygame.Surface], tuple]) -> tuple[int, int]:
     """
@@ -24,7 +39,6 @@ def get_surfcolors(func: Callable[[pygame.Surface], tuple]) -> tuple[int, int]:
     for i in _loaded.popitem()[1]:
         _colors.append(i)
     testsurf = pygame.Surface((64, 64))
-    testsurf.set_colorkey()
     testrect = testsurf.get_rect()
 
     _cw, _ch = testrect.w//2, testrect.h//2
