@@ -2,28 +2,18 @@ import pygame
 
 from secrets import randbelow
 
-def get_subimage(
-        rectangle: tuple[int, int, int, int],
-        filepath: str,
-    ) -> pygame.Surface:
-    """
-    returns a subimage of the given rect 
-    """
-    image = pygame.Surface(
-        rectangle[:2], 
-        flags=pygame.BLEND_ALPHA_SDL2 | pygame.SRCALPHA
-    )
-    image.blit(pygame.image.load(filepath), (0, 0), rectangle)
-    return image
 
-def get_subimages(image: pygame.Surface) -> list[pygame.Surface]:
+def get_subimages(sheet: pygame.Surface) -> list[pygame.Surface]:
     """
     return a list of surfaces from the given surface
-    divided by the color at (0,0)
+    divided by the color at (0,0) unless the image has a colorkey 
     """
-    _img = image
-    _colorkey = _img.get_at((0, 0))
-    _mask = pygame.mask.from_surface(_img, threshold=174) # test threshhold
+    _colorkey = sheet.get_colorkey()
+    if _colorkey == None:
+        _colorkey = sheet.get_at((0, 0))
+    
+    _colorkey = sheet.get_colorkey() if sheet.get_colorkey() else sheet.get_at((0, 0))
+    _mask = pygame.mask.from_surface(sheet, threshold=174) # test threshhold
     _images = list()
 
     for (surf, rect) in [
@@ -35,7 +25,7 @@ def get_subimages(image: pygame.Surface) -> list[pygame.Surface]:
             _rect,
         ) for _rect in _mask.get_bounding_rects()
     ]:
-        surf.blit(_img, (0, 0), area=rect)
+        surf.blit(sheet, (0, 0), area=rect)
         surf.set_colorkey(_colorkey)
         _images.append(surf)
     return _images

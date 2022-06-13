@@ -9,9 +9,10 @@ if __name__ == "__main__":
 
     # TEST
 
+    ####### pixel #######
     test.pixel.get_surfcolors(pizmos.pixel.get_surfcolors)
-
     test.pixel.replace_color(pizmos.pixel.replace_color)
+    ####### pixel #######
 
     # TEST
 

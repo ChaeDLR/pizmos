@@ -50,26 +50,6 @@ def __launch_window() -> None:
                     )
         pygame.display.update()
 
-
-def from_image_file(
-            func: Callable[[Iterable, str], pygame.Surface],
-            _case=[]
-        ) -> tuple[int, int]:
-    """
-    (rectangle, filepath) -> Surface
-    """
-    pass
-
-def get_subimages(
-            func: Callable[[pygame.Surface, Iterable],
-            list[pygame.Surface]],
-            _case=[]
-        ) -> tuple[int, int]:
-    """
-    (Surface, size) -> list[Surface]
-    """
-    pass
-
 def trim(
             func: Callable[[pygame.Surface],
             tuple[pygame.Surface, pygame.Rect]],
