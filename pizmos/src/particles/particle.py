@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from random import randint
 from pygame import Vector2
 
 
@@ -20,9 +19,12 @@ class Particle:
 
     @alpha.setter
     def alpha(self, value: float) -> None:
-        if value < 20: self.color[3] = 0
-        elif value > 255: self.color[3] = 255
-        else: self.color[3] = value
+        if value < 20:
+            self.color[3] = 0
+        elif value > 255:
+            self.color[3] = 255
+        else:
+            self.color[3] = value
 
     def update(self) -> None:
         """update the particles values"""

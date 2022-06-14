@@ -1,19 +1,19 @@
 import pygame
 
-from secrets import randbelow
+from collections.abc import Sequence
 
 
 def get_subimages(sheet: pygame.Surface) -> list[pygame.Surface]:
     """
     return a list of surfaces from the given surface
-    divided by the color at (0,0) unless the image has a colorkey 
+    divided by the color at (0,0) unless the image has a colorkey
     """
     _colorkey = sheet.get_colorkey()
     if _colorkey == None:
         _colorkey = sheet.get_at((0, 0))
-    
+
     _colorkey = sheet.get_colorkey() if sheet.get_colorkey() else sheet.get_at((0, 0))
-    _mask = pygame.mask.from_surface(sheet, threshold=174) # test threshhold
+    _mask = pygame.mask.from_surface(sheet, threshold=174)  # test threshhold
     _images = list()
 
     for (surf, rect) in [
@@ -23,19 +23,21 @@ def get_subimages(sheet: pygame.Surface) -> list[pygame.Surface]:
                 flags=pygame.BLEND_ALPHA_SDL2 | pygame.SRCALPHA,
             ),
             _rect,
-        ) for _rect in _mask.get_bounding_rects()
+        )
+        for _rect in _mask.get_bounding_rects()
     ]:
         surf.blit(sheet, (0, 0), area=rect)
         surf.set_colorkey(_colorkey)
         _images.append(surf)
     return _images
 
+
 def trim(image: pygame.Surface) -> tuple[pygame.Surface, pygame.rect.Rect]:
     """
     Remove as much of the colorkey as possible
     """
     _img = image
-    _mask: pygame.mask.Mask = pygame.mask.from_surface(_img) # test threshhold
+    _mask: pygame.mask.Mask = pygame.mask.from_surface(_img)  # test threshhold
     _rect: pygame.rect.Rect = _mask.get_bounding_rects()[0]
     image = pygame.Surface(_rect.size, flags=pygame.BLEND_ALPHA_SDL2)
     image.blit(_img, (0, 0), area=_rect)
@@ -44,8 +46,8 @@ def trim(image: pygame.Surface) -> tuple[pygame.Surface, pygame.rect.Rect]:
 
 
 def slicendice(
-        sheet: pygame.Surface, grid: tuple[int, int], margins: tuple = (0, 0, 0, 0)
-    ) -> list[pygame.Surface]:
+    sheet: pygame.Surface, grid: Sequence[int, int], margins: tuple = (0, 0, 0, 0)
+) -> list[pygame.Surface]:
     """
     cut the spritesheet by the given dimensions
     grid: tuple[col, rows]
@@ -63,21 +65,3 @@ def slicendice(
             new_button.set_colorkey(new_button.get_at((0, 0)))
             cut_buttons.append(new_button)
     return cut_buttons
-
-def coloredsurf(size: tuple=(64, 64)) -> pygame.Surface:
-    """
-    Create a surface and fill each corner with a random color
-    """
-    _surf = pygame.Surface(
-            size,
-            flags=pygame.BLEND_ALPHA_SDL2 | pygame.SRCALPHA
-        )
-    _colors = [
-            (randbelow(256), randbelow(256), randbelow(256), (255)) for _ in range(4)
-        ]
-
-    _cw, _ch = size[0]//2, size[1]//2
-    for i in range(2):
-        _surf.fill(_colors.pop(), (_cw*i, 0, _cw, _ch))
-        _surf.fill(_colors.pop(), (_cw*i, _ch, _cw, _ch))
-    return _surf

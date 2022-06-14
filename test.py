@@ -5,13 +5,14 @@ import test
 
 if __name__ == "__main__":
 
-    testsurf = pizmos.image.coloredsurf()
+    testsurf = pizmos.pixel.coloredsurf()
 
     # TEST
 
     ####### pixel #######
     test.pixel.get_surfcolors(pizmos.pixel.get_surfcolors)
     test.pixel.replace_color(pizmos.pixel.replace_color)
+    test.pixel.coloredsurf(pizmos.pixel.coloredsurf)
     ####### pixel #######
 
     # TEST
@@ -20,32 +21,27 @@ if __name__ == "__main__":
     idisplay = pygame.display.Info()
 
     display: pygame.Surface = pygame.display.set_mode(
-            size=(idisplay.current_w//2, idisplay.current_h//2),
-            flags=pygame.SCALED,
-            display=0,
-            vsync=1
-        )
+        size=(idisplay.current_w // 2, idisplay.current_h // 2),
+        flags=pygame.SCALED,
+        display=0,
+        vsync=1,
+    )
     display.fill((230, 215, 212, 255))
 
     clock = pygame.time.Clock()
-    pygame.event.set_allowed(
-            [pygame.QUIT, pygame.MOUSEBUTTONDOWN]
-        )
+    pygame.event.set_allowed([pygame.QUIT, pygame.MOUSEBUTTONDOWN])
 
     _updates: list = []
-    _updates.append(display.blit(testsurf, testsurf.get_rect(
-                    center=(
-                        display.get_width()//2,
-                        display.get_height()//2
-                    )
-                )
-            )
+    _updates.append(
+        display.blit(
+            testsurf,
+            testsurf.get_rect(
+                center=(display.get_width() // 2, display.get_height() // 2)
+            ),
         )
+    )
     _CLEARUPDATE = pygame.event.custom_type()
-    pygame.time.set_timer(
-            pygame.event.Event(_CLEARUPDATE),
-            10
-        )
+    pygame.time.set_timer(pygame.event.Event(_CLEARUPDATE), 10)
     while 1:
         clock.tick(60)
         for event in pygame.event.get():
@@ -53,12 +49,11 @@ if __name__ == "__main__":
                 sys.exit()
             if event.type == _CLEARUPDATE:
                 _updates.clear()
-        display.blit(testsurf, testsurf.get_rect(
-                    center=(
-                        display.get_width()//2,
-                        display.get_height()//2
-                    )
-                )
-            )
+        display.blit(
+            testsurf,
+            testsurf.get_rect(
+                center=(display.get_width() // 2, display.get_height() // 2)
+            ),
+        )
 
         pygame.display.update(_updates)

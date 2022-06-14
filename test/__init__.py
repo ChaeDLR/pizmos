@@ -1,3 +1,1 @@
-from . import (
-    image, pixel
-)
+from . import pixel

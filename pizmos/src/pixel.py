@@ -1,9 +1,12 @@
 import pygame
 
+
 from numpy import array
+from secrets import randbelow
+from collections.abc import Sequence
 
 
-def replace_color(surf: pygame.Surface, old: tuple | list, new: tuple | list) -> pygame.Surface:
+def replace_color(surf: pygame.Surface, old: Sequence, new: Sequence) -> pygame.Surface:
     """
     replaces a color in an image, supports 24-bit and 32-bit formats.
     """
@@ -28,17 +31,19 @@ def replace_color(surf: pygame.Surface, old: tuple | list, new: tuple | list) ->
     surf.unlock()
     return surf
 
+
 def get_surfcolors(img: pygame.Surface) -> tuple:
     """
     Loop through a surface and grab the colors its made of
     sort from lightest(n) to darkest(0)
     """
-    if not isinstance(img, pygame.Surface): raise TypeError
+    if not isinstance(img, pygame.Surface):
+        raise TypeError
 
     _alpha: int = img.get_alpha()
     if _alpha == None:
         _alpha = 255
-    
+
     excluded = []
     if _cc := img.get_colorkey():
         excluded.append(list(_cc))
@@ -54,3 +59,19 @@ def get_surfcolors(img: pygame.Surface) -> tuple:
 
     colors.sort(key=sum)
     return tuple(colors)
+
+
+def coloredsurf(size: tuple = (64, 64)) -> pygame.Surface:
+    """
+    Create a surface and fill each corner with a random color
+    """
+    _surf = pygame.Surface(size, flags=pygame.BLEND_ALPHA_SDL2 | pygame.SRCALPHA)
+    _colors = [
+        (randbelow(256), randbelow(256), randbelow(256), (255)) for _ in range(4)
+    ]
+
+    _cw, _ch = size[0] // 2, size[1] // 2
+    for i in range(2):
+        _surf.fill(_colors.pop(), (_cw * i, 0, _cw, _ch))
+        _surf.fill(_colors.pop(), (_cw * i, _ch, _cw, _ch))
+    return _surf
