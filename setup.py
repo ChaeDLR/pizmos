@@ -6,7 +6,9 @@ Github:
 """
 import pizmos
 
+from sphinx.setup_command import BuildDoc
 from setuptools import setup, find_packages
+
 
 with open("README.md", "r", encoding="utf-8") as rm:
     readme = rm.read()
@@ -32,4 +34,13 @@ setup(
     install_requires=list(open("requirements.txt", "r").readlines()),
     zip_safe=True,
     packages=find_packages(),
+    cmdclass={"build_sphinx": BuildDoc},
+    command_options={
+        "build_sphinx": {
+            "project": ("setup.py", pizmos.__title__),
+            "version": ("setup.py", pizmos.__version__),
+            "release": ("setup.py", pizmos.__release__),
+            "source_dir": ("setup.py", "docs/source"),
+        }
+    },
 )
