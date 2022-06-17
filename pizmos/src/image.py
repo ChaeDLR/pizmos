@@ -1,3 +1,9 @@
+"""
+Author:
+    Chae De La Rosa
+Github:
+    https://github.com/ChaeDLR
+"""
 import pygame
 
 from collections.abc import Sequence
@@ -45,7 +51,7 @@ def trim(image: pygame.Surface) -> tuple[pygame.Surface, pygame.rect.Rect]:
     return (image, pygame.rect)
 
 
-def slicendice(
+def cut_sheet(
     sheet: pygame.Surface, grid: Sequence[int, int], margins: tuple = (0, 0, 0, 0)
 ) -> list[pygame.Surface]:
     """
