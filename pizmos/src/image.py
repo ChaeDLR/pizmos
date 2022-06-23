@@ -1,9 +1,3 @@
-"""
-Author:
-    Chae De La Rosa
-Github:
-    https://github.com/ChaeDLR
-"""
 import pygame
 
 from collections.abc import Sequence
@@ -19,7 +13,7 @@ def get_subimages(sheet: pygame.Surface) -> list[pygame.Surface]:
         _colorkey = sheet.get_at((0, 0))
 
     _colorkey = sheet.get_colorkey() if sheet.get_colorkey() else sheet.get_at((0, 0))
-    _mask = pygame.mask.from_surface(sheet, threshold=174)  # test threshhold
+    _mask = pygame.mask.from_surface(sheet, threshold=174)
     _images = list()
 
     for (surf, rect) in [
@@ -43,7 +37,7 @@ def trim(image: pygame.Surface) -> tuple[pygame.Surface, pygame.rect.Rect]:
     Remove as much of the colorkey as possible
     """
     _img = image
-    _mask: pygame.mask.Mask = pygame.mask.from_surface(_img)  # test threshhold
+    _mask: pygame.mask.Mask = pygame.mask.from_surface(_img)
     _rect: pygame.rect.Rect = _mask.get_bounding_rects()[0]
     image = pygame.Surface(_rect.size, flags=pygame.BLEND_ALPHA_SDL2)
     image.blit(_img, (0, 0), area=_rect)
