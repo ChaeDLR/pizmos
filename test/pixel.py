@@ -99,16 +99,11 @@ def coloredsurf(func: Callable[[Sequence], pygame.Surface]):
     pygame.time.set_timer(pygame.event.Event(_CLEARUPDATE), 10)
     while 1:
         clock.tick(60)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exit()
             if event.type == _CLEARUPDATE:
                 _updates.clear()
-        display.blit(
-            test_surf,
-            test_surf.get_rect(
-                center=(display.get_width() // 2, display.get_height() // 2)
-            ),
-        )
 
         pygame.display.update(_updates)

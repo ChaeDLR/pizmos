@@ -3,10 +3,14 @@ from pygame import Vector2
 from .particle import Particle
 
 
-def explosion(start_position: tuple[int, int]) -> list[Particle]:
-    """
-    return a list of particles that have slopes
-    that create and explosion effect
+def explosion(start_position: Vector2) -> list[Particle]:
+    """Creates Particle list with explosion slopes
+
+    Args:
+        start_position (Vector2): x and y values
+
+    Returns:
+        list[Particle]: All the Particles that make up the effect
     """
     particles: list[Particle] = []
 
@@ -56,3 +60,44 @@ def explosion(start_position: tuple[int, int]) -> list[Particle]:
             )
 
     return particles
+
+
+if __name__ == "__main__":
+    import pygame
+
+    _effects = {"explosion": explosion}
+
+    pygame.display.init()
+    display_info = pygame.display.Info()
+
+    window: pygame.Surface = pygame.display.set_mode(
+        size=(display_info.current_w // 2, display_info.current_h // 2),
+        flags=pygame.SCALED | pygame.BLEND_ALPHA_SDL2,
+        display=0,
+        vsync=1,
+    )
+    window_rect: pygame.Rect = window.fill((10, 10, 10, 255))
+
+    clock: pygame.time.Clock = pygame.time.Clock()
+
+    pygame.event.set_allowed([pygame.QUIT, pygame.MOUSEBUTTONDOWN])
+
+    updates: list[pygame.Rect] = []
+
+    _font = pygame.font.Font(size=16)
+    effects_text = []
+    for name in _effects.keys():
+        effects_text.append(_font.render(name, True, (255, 255, 255), (10, 10, 10)))
+
+    while 1:
+        clock.tick(60)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
+
+        # tuple[Surface, coord]
+        # window.blits()
+
+        pygame.display.update(updates[:])
+        updates.clear()
