@@ -1,6 +1,10 @@
 from random import randint
 from pygame import Vector2
-from .particle import Particle
+
+if __name__ == "__main__":
+    from particle import Particle
+else:
+    from .particle import Particle
 
 
 def explosion(start_position: Vector2) -> list[Particle]:
@@ -72,11 +76,11 @@ if __name__ == "__main__":
 
     window: pygame.Surface = pygame.display.set_mode(
         size=(display_info.current_w // 2, display_info.current_h // 2),
-        flags=pygame.SCALED | pygame.BLEND_ALPHA_SDL2,
+        flags=pygame.SRCALPHA,
         display=0,
         vsync=1,
     )
-    window_rect: pygame.Rect = window.fill((10, 10, 10, 255))
+    window_rect: pygame.Rect = window.get_rect()
 
     clock: pygame.time.Clock = pygame.time.Clock()
 
@@ -84,10 +88,27 @@ if __name__ == "__main__":
 
     updates: list[pygame.Rect] = []
 
-    _font = pygame.font.Font(size=16)
-    effects_text = []
-    for name in _effects.keys():
-        effects_text.append(_font.render(name, True, (255, 255, 255), (10, 10, 10)))
+    pygame.font.init()
+    font_size = 16
+    _font = pygame.font.SysFont(None, font_size)
+
+    _text_column = display_info.current_w // 16
+    _text_row = display_info.current_h // 12
+    text_positions: list[Vector2] = [
+        Vector2(_text_column, _text_row * (i + 1)) for i in range(len(_effects))
+    ]
+
+    assert text_positions[-1].y < (display_info.current_h - font_size)
+
+    effects_text = {"selected": [], "nonselected": []}
+    for i, name in enumerate(_effects.keys()):
+        effects_text["selected"].append(
+            (_font.render(name, True, (255, 255, 255, 255), (0, 0, 0, 255)), text_positions[i])
+        )
+
+        effects_text["nonselected"].append(
+            (_font.render(name, True, (0, 0, 0, 255), (255, 255, 255, 255)), text_positions[i])
+        )
 
     while 1:
         clock.tick(60)
@@ -96,8 +117,10 @@ if __name__ == "__main__":
             if event.type == pygame.QUIT:
                 exit()
 
-        # tuple[Surface, coord]
-        # window.blits()
+        window.fill((255, 255, 255, 255))
 
-        pygame.display.update(updates[:])
+        updates.append(window.blits(effects_text["nonselected"]))
+
+        #pygame.display.update(updates[:]) # does not work with opengl
+        pygame.display.flip()
         updates.clear()
