@@ -69,7 +69,11 @@ def explosion(start_position: Vector2) -> list[Particle]:
 if __name__ == "__main__":
     import pygame
 
-    _effects = {"explosion": explosion}
+    _effects = {
+        "explosion": explosion,
+        "explosion_spiral": explosion,
+        "blip": explosion,
+    }
 
     pygame.display.init()
     display_info = pygame.display.Info()
@@ -89,26 +93,38 @@ if __name__ == "__main__":
     updates: list[pygame.Rect] = []
 
     pygame.font.init()
-    font_size = 16
+    font_size = 20
     _font = pygame.font.SysFont(None, font_size)
 
-    _text_column = display_info.current_w // 16
-    _text_row = display_info.current_h // 12
+    _text_column = display_info.current_w // 28
+    _text_row = display_info.current_h // 24
     text_positions: list[Vector2] = [
         Vector2(_text_column, _text_row * (i + 1)) for i in range(len(_effects))
     ]
 
     assert text_positions[-1].y < (display_info.current_h - font_size)
 
-    effects_text = {"selected": [], "nonselected": []}
+    effects_text = {"selected": [], "nonselected": [], "rects": []}
     for i, name in enumerate(_effects.keys()):
-        effects_text["selected"].append(
-            (_font.render(name, True, (255, 255, 255, 255), (0, 0, 0, 255)), text_positions[i])
-        )
+
+        text = _font.render(name, True, (255, 255, 255, 255), (0, 0, 0, 255))
+        text_rect: pygame.Rect = text.get_rect(topleft=text_positions[i])
+
+        effects_text["selected"].append((text, text_rect))
 
         effects_text["nonselected"].append(
-            (_font.render(name, True, (0, 0, 0, 255), (255, 255, 255, 255)), text_positions[i])
+            (_font.render(name, True, (0, 0, 0, 255), (255, 255, 255, 255)), text_rect)
         )
+
+        effects_text["rects"].append(text_rect)
+
+    active_text = effects_text["nonselected"][:]
+
+    pygame.event.set_allowed(
+        [pygame.MOUSEMOTION, pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP]
+    )
+
+    text_index = 0
 
     while 1:
         clock.tick(60)
@@ -117,10 +133,18 @@ if __name__ == "__main__":
             if event.type == pygame.QUIT:
                 exit()
 
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                for rect in effects_text["rects"]:
+                    if rect.collidepoint(event.pos):
+                        active_text[text_index] = effects_text["nonselected"][text_index]
+                        text_index = effects_text["rects"].index(rect)
+                        active_text[text_index] = effects_text["selected"][text_index]
+
+
         window.fill((255, 255, 255, 255))
+        updates.append(window.blits(active_text))
 
-        updates.append(window.blits(effects_text["nonselected"]))
 
-        #pygame.display.update(updates[:]) # does not work with opengl
+        # pygame.display.update(updates[:]) # does not work with opengl
         pygame.display.flip()
         updates.clear()
