@@ -4,9 +4,13 @@ from collections.abc import Sequence
 
 
 def get_subimages(sheet: pygame.Surface) -> list[pygame.Surface]:
-    """
-    return a list of surfaces from the given surface
-    divided by the color at (0,0) unless the image has a colorkey
+    """get subimages from a given surface
+
+    Args:
+        sheet (pygame.Surface): Surface containing multiple images divided by a colorkey or the color at (0, 0)
+
+    Returns:
+        list[pygame.Surface]: A list containing all of the found subimages
     """
     _colorkey = sheet.get_colorkey()
     if _colorkey == None:
@@ -32,9 +36,14 @@ def get_subimages(sheet: pygame.Surface) -> list[pygame.Surface]:
     return _images
 
 
-def trim(image: pygame.Surface) -> tuple[pygame.Surface, pygame.rect.Rect]:
-    """
-    Remove as much of the colorkey as possible
+def trim(image: pygame.Surface) -> pygame.Surface:
+    """Remove as much of the colorkey as possible
+
+    Args:
+        image (pygame.Surface)
+
+    Returns:
+        pygame.Surface
     """
     _img = image
     _mask: pygame.mask.Mask = pygame.mask.from_surface(_img)
@@ -42,16 +51,21 @@ def trim(image: pygame.Surface) -> tuple[pygame.Surface, pygame.rect.Rect]:
     image = pygame.Surface(_rect.size, flags=pygame.BLEND_ALPHA_SDL2)
     image.blit(_img, (0, 0), area=_rect)
     image.set_colorkey(image.get_at((0, 0)))
-    return (image, pygame.rect)
+    return image
 
 
 def cut_sheet(
     sheet: pygame.Surface, grid: Sequence[int, int], margins: tuple = (0, 0, 0, 0)
 ) -> list[pygame.Surface]:
-    """
-    cut the spritesheet by the given dimensions
-    grid: tuple[col, rows]
-    margins: tuple[top, bottom, left, right]
+    """cut the spritesheet by the given dimensions
+
+    Args:
+        sheet (pygame.Surface)
+        grid (Sequence[int, int]): number of (columns, rows) to slice
+        margins (tuple, optional): [top, bottom, left, right]. Defaults to (0, 0, 0, 0).
+
+    Returns:
+        list[pygame.Surface]
     """
     img_width: int = int((sheet.get_width() - (margins[2] + margins[3])) / grid[0])
     img_height: int = int((sheet.get_height() - (margins[0] + margins[1])) / grid[1])
