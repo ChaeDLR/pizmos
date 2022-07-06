@@ -69,13 +69,27 @@ def explosion(start_position: Vector2) -> list[Particle]:
 if __name__ == "__main__":
     import pygame
 
-    _effects = {
-        "explosion": explosion,
-        "explosion_spiral": explosion,
-        "blip": explosion,
-    }
+    class _Effect:
+        name: str = None
+        selected: bool = False
 
+        select_text: pygame.Surface = None
+        nonselect_text: pygame.Surface = None
+        text_rect: pygame.Rect = None
+
+        get_particles: callable = None
+
+        def __init__(self, **kwargs):
+            for key, value in kwargs.items():
+                setattr(self, key, value)
+            self.name = self.get_particles.__name__
+
+    _effects: list[_Effect] = [_Effect(get_particles=explosion)]
+
+    # region set display
     pygame.display.init()
+    pygame.font.init()
+
     display_info = pygame.display.Info()
 
     window: pygame.Surface = pygame.display.set_mode(
@@ -84,15 +98,17 @@ if __name__ == "__main__":
         display=0,
         vsync=1,
     )
+
     window_rect: pygame.Rect = window.get_rect()
 
     clock: pygame.time.Clock = pygame.time.Clock()
 
-    pygame.event.set_allowed([pygame.QUIT, pygame.MOUSEBUTTONDOWN])
+    pygame.event.set_allowed(
+        [pygame.QUIT, pygame.MOUSEMOTION, pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP]
+    )
+    # endregion
 
-    updates: list[pygame.Rect] = []
-
-    pygame.font.init()
+    # region create text
     font_size = 20
     _font = pygame.font.SysFont(None, font_size)
 
@@ -102,49 +118,91 @@ if __name__ == "__main__":
         Vector2(_text_column, _text_row * (i + 1)) for i in range(len(_effects))
     ]
 
-    assert text_positions[-1].y < (display_info.current_h - font_size)
+    assert text_positions[-1].y < (
+        display_info.current_h - font_size
+    ), "Unsupported display size."
 
-    effects_text = {"selected": [], "nonselected": [], "rects": []}
-    for i, name in enumerate(_effects.keys()):
-
-        text = _font.render(name, True, (255, 255, 255, 255), (0, 0, 0, 255))
-        text_rect: pygame.Rect = text.get_rect(topleft=text_positions[i])
-
-        effects_text["selected"].append((text, text_rect))
-
-        effects_text["nonselected"].append(
-            (_font.render(name, True, (0, 0, 0, 255), (255, 255, 255, 255)), text_rect)
+    for i, _effect in enumerate(_effects):
+        _effect.select_text = _font.render(
+            _effect.get_particles.__name__, True, (255, 255, 255, 255), (0, 0, 0, 255)
         )
 
-        effects_text["rects"].append(text_rect)
+        _effect.nonselect_text = _font.render(
+            _effect.get_particles.__name__, True, (0, 0, 0, 255), (255, 255, 255, 255)
+        )
 
-    active_text = effects_text["nonselected"][:]
+        _effect.text_rect = _effect.select_text.get_rect(topleft=text_positions[i])
 
-    pygame.event.set_allowed(
-        [pygame.MOUSEMOTION, pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP]
-    )
+    # texts that should be displayed in the window paired with their rect
+    active_texts = [[_effect.nonselect_text, _effect.text_rect] for _effect in _effects]
 
-    text_index = 0
+    # active effect index
+    active_index = 0
+
+    # set the first effect as active
+    active_texts[active_index][0] = _effects[active_index].select_text
+
+    # endregion
+
+    # stores rects of areas that should be updates in the window
+    updates: list[pygame.Rect] = []
+
+    # stores live particles
+    particles: list[Particle] = []
 
     while 1:
         clock.tick(60)
+
+        # region events/update
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exit()
 
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                for rect in effects_text["rects"]:
-                    if rect.collidepoint(event.pos):
-                        active_text[text_index] = effects_text["nonselected"][text_index]
-                        text_index = effects_text["rects"].index(rect)
-                        active_text[text_index] = effects_text["selected"][text_index]
+            elif event.type == pygame.MOUSEMOTION:
+                for _effect in _effects:
+                    if _effect.text_rect.collidepoint(event.pos):
 
+                        # set the previous active effect to nonselect
+                        active_texts[active_index][0] = _effects[
+                            active_index
+                        ].nonselect_text
+
+                        # get new active index
+                        active_index = _effects.index(_effect)
+
+                        # set new active text
+                        active_texts[active_index][0] = _effects[
+                            active_index
+                        ].select_text
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                particles += _effects[active_index].get_particles(event.pos)
+
+        # endregion
+
+        # region draw
 
         window.fill((255, 255, 255, 255))
-        updates.append(window.blits(active_text))
 
+        for particle in particles:
+            particle.update()
 
-        # pygame.display.update(updates[:]) # does not work with opengl
+            if particle.alpha == 0:
+                particles.remove(particle)
+                del particle
+            else:
+                pygame.draw.circle(
+                    surface=window,
+                    color=particle.color,
+                    center=particle.center,
+                    radius=particle.radius,
+                )
+
+        updates.append(window.blits(active_texts))
+
+        # endregion
+
+        # pygame.display.update(updates[:]) # does not work with opengl, need to add check
         pygame.display.flip()
         updates.clear()
