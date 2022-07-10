@@ -1,4 +1,5 @@
 import pygame
+import os
 
 from collections.abc import Sequence
 
@@ -55,7 +56,7 @@ def trim(image: pygame.Surface) -> pygame.Surface:
 
 
 def cut_sheet(
-    sheet: pygame.Surface, grid: Sequence[int, int], margins: tuple = (0, 0, 0, 0)
+    sheet: pygame.Surface, grid: tuple | list, margins: tuple | list = (0, 0, 0, 0)
 ) -> list[pygame.Surface]:
     """cut the spritesheet by the given dimensions
 
@@ -79,3 +80,26 @@ def cut_sheet(
             new_button.set_colorkey(new_button.get_at((0, 0)))
             cut_buttons.append(new_button)
     return cut_buttons
+
+
+def load(path: str, imgs_dict: dict = {}) -> dict:
+    """Recursive method that loads all the images in a directory and its subdirectories
+
+    Args:
+        path (str): Head directory
+        imgs_dict (dict): _description_
+    """
+
+    temp_imgs: list = []
+
+    for file in os.listdir(path):
+
+        if os.path.isdir(file):
+
+            imgs_dict[file] = load(os.path.abspath(os.path.join(path, file)), imgs_dict)
+
+        elif os.path.isfile(file):
+
+            temp_imgs[file.split(".")[0]] = pygame.image.load(os.path.join(path, file))
+
+    return imgs_dict
