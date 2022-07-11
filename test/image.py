@@ -22,19 +22,21 @@ def load(func: callable):
                 test_images.pop(), os.path.join(current_path, f"test_image_{i}.bmp")
             )
 
-    _images = func(head_dir)
+    # _images = func(head_dir)
 
-    current_path = head_dir
+    # delete the test dirs
+    while current_path != head_dir:
 
-    # delete test dirs
-    for _test_dir in dir_names[::-1]:
+        for _file in os.listdir(current_path):
+            if os.path.isfile(_file):
+                os.remove(_file)
+            else:
+                os.rmdir(f"./{_file}")
 
-        current_path = os.path.join(current_path, _test_dir)
+        os.chdir("..")
+        current_path = os.getcwd()
 
-        os.chdir(current_path)
-
-        for i in os.listdir(current_path):
-            ...
+    os.rmdir("testdir_0")
 
 
 if __name__ == "__main__":
