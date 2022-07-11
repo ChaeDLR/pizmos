@@ -90,8 +90,6 @@ def load(path: str, imgs_dict: dict = {}) -> dict:
         imgs_dict (dict): _description_
     """
 
-    temp_imgs: list = []
-
     for file in os.listdir(path):
 
         if os.path.isdir(file):
@@ -100,6 +98,6 @@ def load(path: str, imgs_dict: dict = {}) -> dict:
 
         elif os.path.isfile(file):
 
-            temp_imgs[file.split(".")[0]] = pygame.image.load(os.path.join(path, file))
+            imgs_dict[file.split(".")[0]] = pygame.image.load(os.path.join(path, file))
 
     return imgs_dict
