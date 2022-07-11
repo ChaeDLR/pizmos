@@ -73,7 +73,7 @@ def cut_sheet(
 
     cut_buttons = []
     for column in [int(img_width * i + margins[3]) for i in range(grid[0])]:
-        for row in [int(img_height * i + margins[0]) for i in range(grid[1])]:
+        for row in [int(img_height * j + margins[0]) for j in range(grid[1])]:
             new_button = pygame.Surface((img_width, img_height))
             new_button.blit(sheet, (0, 0), area=[column, row, img_width, img_height])
             new_button = pygame.transform.scale(new_button, (250, 150))
