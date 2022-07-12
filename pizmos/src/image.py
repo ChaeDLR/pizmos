@@ -1,6 +1,5 @@
 import pygame
-
-from collections.abc import Sequence
+import os
 
 
 def get_subimages(sheet: pygame.Surface) -> list[pygame.Surface]:
@@ -55,7 +54,7 @@ def trim(image: pygame.Surface) -> pygame.Surface:
 
 
 def cut_sheet(
-    sheet: pygame.Surface, grid: Sequence[int, int], margins: tuple = (0, 0, 0, 0)
+    sheet: pygame.Surface, grid: tuple | list, margins: tuple | list = (0, 0, 0, 0)
 ) -> list[pygame.Surface]:
     """cut the spritesheet by the given dimensions
 
@@ -72,10 +71,34 @@ def cut_sheet(
 
     cut_buttons = []
     for column in [int(img_width * i + margins[3]) for i in range(grid[0])]:
-        for row in [int(img_height * i + margins[0]) for i in range(grid[1])]:
+        for row in [int(img_height * j + margins[0]) for j in range(grid[1])]:
             new_button = pygame.Surface((img_width, img_height))
             new_button.blit(sheet, (0, 0), area=[column, row, img_width, img_height])
             new_button = pygame.transform.scale(new_button, (250, 150))
             new_button.set_colorkey(new_button.get_at((0, 0)))
             cut_buttons.append(new_button)
     return cut_buttons
+
+
+def load_all(path: str, imgs_dict: dict = {}) -> dict:
+    """Recursive method that loads all the images in a directory and its subdirectories
+    key = image file name without extension, value = pygame.Surface
+
+    Args:
+        path (str): Head directory
+        imgs_dict (dict): _description_
+    """
+    _cpath = None
+    for _file in os.listdir(path):
+        _cpath = os.path.join(path, _file)
+        if os.path.isdir(_cpath):
+
+            load_all(os.path.abspath(os.path.join(path, _file)), imgs_dict)
+
+        elif os.path.isfile(_cpath):
+
+            imgs_dict[_file.split(".")[0]] = pygame.image.load(
+                os.path.join(path, _file)
+            )
+
+    return imgs_dict

@@ -11,9 +11,6 @@ def replace_color(func: Callable[[pygame.Surface], Sequence]):
     """
     replace_color(surf: pygame.Surface, old: Sequence, new: Sequence)
     """
-    if not callable(func):
-        raise TypeError
-
     testsurf = pygame.Surface((64, 64))
     testsurf.fill((200, 200, 200, 255))
 
@@ -33,9 +30,6 @@ def get_surfcolors(func: Callable[[pygame.Surface], tuple]):
     """
     (Surface) -> Sequence
     """
-    if not callable(func):
-        raise TypeError
-
     colors = list()
     with open(os.path.abspath("./test/cases/surfcolors.json"), "r") as sctext:
         loaded: dict = json.load(sctext)
@@ -66,11 +60,7 @@ def get_surfcolors(func: Callable[[pygame.Surface], tuple]):
 
 
 def coloredsurf(func: Callable[[Sequence], pygame.Surface]):
-    if not isinstance(func, Callable):
-        raise TypeError
     test_surf = func((120, 120))
-
-    assert isinstance(test_surf, pygame.Surface)
 
     pygame.display.init()
     idisplay = pygame.display.Info()
