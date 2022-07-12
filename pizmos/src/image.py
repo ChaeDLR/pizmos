@@ -1,8 +1,6 @@
 import pygame
 import os
 
-from collections.abc import Sequence
-
 
 def get_subimages(sheet: pygame.Surface) -> list[pygame.Surface]:
     """get subimages from a given surface
@@ -82,22 +80,25 @@ def cut_sheet(
     return cut_buttons
 
 
-def load(path: str, imgs_dict: dict = {}) -> dict:
+def load_all(path: str, imgs_dict: dict = {}) -> dict:
     """Recursive method that loads all the images in a directory and its subdirectories
+    key = image file name without extension, value = pygame.Surface
 
     Args:
         path (str): Head directory
         imgs_dict (dict): _description_
     """
+    _cpath = None
+    for _file in os.listdir(path):
+        _cpath = os.path.join(path, _file)
+        if os.path.isdir(_cpath):
 
-    for file in os.listdir(path):
+            load_all(os.path.abspath(os.path.join(path, _file)), imgs_dict)
 
-        if os.path.isdir(file):
+        elif os.path.isfile(_cpath):
 
-            imgs_dict[file] = load(os.path.abspath(os.path.join(path, file)), imgs_dict)
-
-        elif os.path.isfile(file):
-
-            imgs_dict[file.split(".")[0]] = pygame.image.load(os.path.join(path, file))
+            imgs_dict[_file.split(".")[0]] = pygame.image.load(
+                os.path.join(path, _file)
+            )
 
     return imgs_dict
