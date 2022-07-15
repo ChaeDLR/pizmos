@@ -186,15 +186,17 @@ if __name__ == "__main__":
 
         window.fill((255, 255, 255, 255))
 
-        for particle in particles:
-            particle.update()
-            particle.draw(window)
-            # TODO: remove empty particle groups
+        for particle_group in particles:
+            particle_group.update()
+            particle_group.draw(window)
+
+            # remove empty lists once all the particles have dissipated
+            if len(particle_group) == 0:
+                particles.remove(particle_group)
 
         updates.append(window.blits(active_texts))
 
         # endregion
 
-        # pygame.display.update(updates[:]) # TODO: does not work with opengl, need to add check
-        pygame.display.flip()
+        pygame.display.update()
         updates.clear()
