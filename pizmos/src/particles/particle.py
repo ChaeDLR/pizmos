@@ -32,3 +32,27 @@ class Particle:
         self.center.y += self.slope[1]
 
         self.alpha -= self.__dissipation_rate
+
+
+class Group:
+
+    __particles = []
+    __index = 0
+
+    def __init__(self, particles: list[Particle]):
+        self.__particles = particles
+
+    def __iter__(self):
+        return self
+
+    def __next__(self) -> Particle:
+        try:
+            self.__index += 1
+            return self.__particles[self.__index - 1]
+        except IndexError:
+            self.__index = 0
+            raise StopIteration
+
+    def update(self) -> None:
+        for _particle in self.__particles:
+            _particle.update()
