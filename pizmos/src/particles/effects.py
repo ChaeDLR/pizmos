@@ -2,12 +2,12 @@ from random import randint
 from pygame import Vector2
 
 if __name__ == "__main__":
-    from particle import Particle
+    from particle import Particle, Group as ParticleGroup
 else:
-    from .particle import Particle
+    from .particle import Particle, group as ParticleGroup
 
 
-def explosion(start_position: Vector2) -> list[Particle]:
+def explosion(start_position: Vector2) -> ParticleGroup:
     """Creates Particle list with explosion slopes
 
     Args:
@@ -63,7 +63,7 @@ def explosion(start_position: Vector2) -> list[Particle]:
                 )
             )
 
-    return particles
+    return ParticleGroup(particles)
 
 
 if __name__ == "__main__":
@@ -84,6 +84,7 @@ if __name__ == "__main__":
                 setattr(self, key, value)
             self.name = self.get_particles.__name__
 
+    #### Add new effects for testing here ####
     _effects: list[_Effect] = [_Effect(get_particles=explosion)]
 
     # region set display
@@ -148,7 +149,7 @@ if __name__ == "__main__":
     updates: list[pygame.Rect] = []
 
     # stores live particles
-    particles: list[Particle] = []
+    particles: list[ParticleGroup] = []
 
     while 1:
         clock.tick(60)
@@ -177,7 +178,7 @@ if __name__ == "__main__":
                         ].select_text
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                particles += _effects[active_index].get_particles(event.pos)
+                particles.append(_effects[active_index].get_particles(event.pos))
 
         # endregion
 
@@ -187,22 +188,13 @@ if __name__ == "__main__":
 
         for particle in particles:
             particle.update()
-
-            if particle.alpha == 0:
-                particles.remove(particle)
-                del particle
-            else:
-                pygame.draw.circle(
-                    surface=window,
-                    color=particle.color,
-                    center=particle.center,
-                    radius=particle.radius,
-                )
+            particle.draw(window)
+            # TODO: remove empty particle groups
 
         updates.append(window.blits(active_texts))
 
         # endregion
 
-        # pygame.display.update(updates[:]) # does not work with opengl, need to add check
+        # pygame.display.update(updates[:]) # TODO: does not work with opengl, need to add check
         pygame.display.flip()
         updates.clear()

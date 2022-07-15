@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from pygame import Vector2
+from pygame import Vector2, Surface, draw
 
 
 @dataclass
@@ -11,7 +11,7 @@ class Particle:
     radius: float
 
     def __post_init__(self):
-        self.__dissipation_rate: float = 5 / self.radius
+        self.__dissipation_rate: float = 6 / self.radius
 
     @property
     def alpha(self) -> int:
@@ -65,3 +65,15 @@ class Group:
     def update(self) -> None:
         for _particle in self.__particles:
             _particle.update()
+            if _particle.alpha == 0:
+                self.__particles.remove(_particle)
+                del _particle
+
+    def draw(self, window: Surface) -> None:
+        for _particle in self.__particles:
+            draw.circle(
+                surface=window,
+                color=_particle.color,
+                center=_particle.center,
+                radius=_particle.radius,
+            )
