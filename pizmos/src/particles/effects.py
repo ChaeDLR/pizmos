@@ -125,11 +125,11 @@ if __name__ == "__main__":
 
     for i, _effect in enumerate(_effects):
         _effect.select_text = _font.render(
-            _effect.get_particles.__name__, True, (255, 255, 255, 255), (0, 0, 0, 255)
+            _effect.get_particles.__name__, True, (0, 0, 0, 255), (55, 255, 255, 255)
         )
 
         _effect.nonselect_text = _font.render(
-            _effect.get_particles.__name__, True, (0, 0, 0, 255), (255, 255, 255, 255)
+            _effect.get_particles.__name__, True, (55, 255, 255, 255), (0, 0, 0, 255)
         )
 
         _effect.text_rect = _effect.select_text.get_rect(topleft=text_positions[i])
@@ -151,6 +151,7 @@ if __name__ == "__main__":
     # stores live particles
     particles: list[ParticleGroup] = []
 
+    # main test loop
     while 1:
         clock.tick(60)
 
@@ -184,19 +185,19 @@ if __name__ == "__main__":
 
         # region draw
 
-        window.fill((255, 255, 255, 255))
+        updates.append(window.fill((5, 5, 5, 255)))
 
         for particle_group in particles:
             particle_group.update()
-            particle_group.draw(window)
+            updates += particle_group.draw(window)
 
             # remove empty lists once all the particles have dissipated
             if len(particle_group) == 0:
                 particles.remove(particle_group)
 
-        updates.append(window.blits(active_texts))
+        updates += window.blits(active_texts)
+
+        pygame.display.update(updates)
+        updates.clear()
 
         # endregion
-
-        pygame.display.update()
-        updates.clear()

@@ -37,6 +37,7 @@ class Particle:
 class Group:
 
     __particles = []
+    __update_rects = []
     __index = 0
 
     def __init__(self, particles: list[Particle]):
@@ -70,10 +71,16 @@ class Group:
                 del _particle
 
     def draw(self, window: Surface) -> None:
+
+        self.__update_rects.clear()
+
         for _particle in self.__particles:
-            draw.circle(
-                surface=window,
-                color=_particle.color,
-                center=_particle.center,
-                radius=_particle.radius,
+            self.__update_rects.append(
+                draw.circle(
+                    surface=window,
+                    color=_particle.color,
+                    center=_particle.center,
+                    radius=_particle.radius,
+                )
             )
+        return self.__update_rects
