@@ -2,12 +2,12 @@ from random import randint
 from pygame import Vector2
 
 if __name__ == "__main__":
-    from particle import Particle
+    from particle import Particle, Group as ParticleGroup
 else:
-    from .particle import Particle
+    from .particle import Particle, group as ParticleGroup
 
 
-def explosion(start_position: Vector2) -> list[Particle]:
+def explosion(start_position: Vector2) -> ParticleGroup:
     """Creates Particle list with explosion slopes
 
     Args:
@@ -63,7 +63,7 @@ def explosion(start_position: Vector2) -> list[Particle]:
                 )
             )
 
-    return particles
+    return ParticleGroup(particles)
 
 
 if __name__ == "__main__":
@@ -84,6 +84,7 @@ if __name__ == "__main__":
                 setattr(self, key, value)
             self.name = self.get_particles.__name__
 
+    #### Add new effects for testing here ####
     _effects: list[_Effect] = [_Effect(get_particles=explosion)]
 
     # region set display
@@ -124,11 +125,11 @@ if __name__ == "__main__":
 
     for i, _effect in enumerate(_effects):
         _effect.select_text = _font.render(
-            _effect.get_particles.__name__, True, (255, 255, 255, 255), (0, 0, 0, 255)
+            _effect.get_particles.__name__, True, (0, 0, 0, 255), (55, 255, 255, 255)
         )
 
         _effect.nonselect_text = _font.render(
-            _effect.get_particles.__name__, True, (0, 0, 0, 255), (255, 255, 255, 255)
+            _effect.get_particles.__name__, True, (55, 255, 255, 255), (0, 0, 0, 255)
         )
 
         _effect.text_rect = _effect.select_text.get_rect(topleft=text_positions[i])
@@ -148,8 +149,9 @@ if __name__ == "__main__":
     updates: list[pygame.Rect] = []
 
     # stores live particles
-    particles: list[Particle] = []
+    particles: list[ParticleGroup] = []
 
+    # main test loop
     while 1:
         clock.tick(60)
 
@@ -177,32 +179,25 @@ if __name__ == "__main__":
                         ].select_text
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                particles += _effects[active_index].get_particles(event.pos)
+                particles.append(_effects[active_index].get_particles(event.pos))
 
         # endregion
 
         # region draw
 
-        window.fill((255, 255, 255, 255))
+        updates.append(window.fill((5, 5, 5, 255)))
 
-        for particle in particles:
-            particle.update()
+        for particle_group in particles:
+            particle_group.update()
+            updates += particle_group.draw(window)
 
-            if particle.alpha == 0:
-                particles.remove(particle)
-                del particle
-            else:
-                pygame.draw.circle(
-                    surface=window,
-                    color=particle.color,
-                    center=particle.center,
-                    radius=particle.radius,
-                )
+            # remove empty lists once all the particles have dissipated
+            if len(particle_group) == 0:
+                particles.remove(particle_group)
 
-        updates.append(window.blits(active_texts))
+        updates += window.blits(active_texts)
+
+        pygame.display.update(updates)
+        updates.clear()
 
         # endregion
-
-        # pygame.display.update(updates[:]) # does not work with opengl, need to add check
-        pygame.display.flip()
-        updates.clear()
