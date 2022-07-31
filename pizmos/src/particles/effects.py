@@ -7,7 +7,7 @@ else:
     from .particle import Particle, group as ParticleGroup
 
 
-def explosion(start_position: Vector2) -> ParticleGroup:
+def explosion(start_position: Vector2 | tuple | list) -> ParticleGroup:
     """Creates Particle list with explosion slopes
 
     Args:
@@ -48,7 +48,7 @@ def explosion(start_position: Vector2) -> ParticleGroup:
         # get the percentage this particle's ROC should be
         # 100% = full speed
         # higher velocity and lower radius = faster particle movement and alpha ROC
-        roc_percentage: float = (velocity / i) / velocity  # try asking Hope
+        roc_percentage: float = (velocity / i) / velocity
 
         for direction in directions:
             particles.append(
@@ -64,6 +64,23 @@ def explosion(start_position: Vector2) -> ParticleGroup:
             )
 
     return ParticleGroup(particles)
+
+
+def blip(start_position: Vector2 | tuple | list, color: tuple | list) -> ParticleGroup:
+    class _Particle(Particle):
+        transform_rate: int = 1
+
+        def update(self, mouse_pos: Vector2 | tuple = (0, 0)):
+            self.center = mouse_pos
+            self.radius += self.transform_rate
+            if self.radius > 5:
+                self.transform_rate -= 1
+            elif self.radius < 1:
+                del self
+
+    return ParticleGroup(
+        [_Particle(color, start_position, (0, 0), (i + 1))] for i in range(3)
+    )
 
 
 if __name__ == "__main__":
@@ -188,7 +205,7 @@ if __name__ == "__main__":
         updates.append(window.fill((5, 5, 5, 255)))
 
         for particle_group in particles:
-            particle_group.update()
+            particle_group.update(mouse_pos=pygame.mouse.get_pos())
             updates += particle_group.draw(window)
 
             # remove empty lists once all the particles have dissipated
