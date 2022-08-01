@@ -33,7 +33,7 @@ class Particle:
 
     @alpha.setter
     def alpha(self, value: float) -> None:
-        if value < 20:
+        if value < 10:
             self.color[3] = 0
         elif value > 255:
             self.color[3] = 255
