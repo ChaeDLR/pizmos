@@ -3,10 +3,10 @@ from pygame import Vector2, Surface, draw
 
 class Particle:
 
-    color: list[int, int, int, int]
-    center: Vector2
-    slope: tuple[int, int]
-    radius: float
+    color: list[int, int, int, int] = []
+    center: Vector2 = Vector2()
+    slope: tuple[int, int] = (0, 0)
+    radius: float = 1.0
 
     def __init__(
         self, color: list, center: Vector2 | tuple, slope: tuple | list, radius: float
@@ -20,6 +20,12 @@ class Particle:
         self.__dissipation_rate: float = 6 / self.radius
 
     # region properties
+
+    @property
+    def expired(self) -> bool:
+        if self.alpha == 0 or self.radius < 1:
+            return True
+        return False
 
     @property
     def alpha(self) -> int:
@@ -45,7 +51,7 @@ class Particle:
 
     # endregion
 
-    def update(self, **kwargs) -> None:
+    def update(self, kwargs: dict) -> None:
         """Update particle position and alpha values"""
         self.center.x += self.slope[0]
         self.center.y += self.slope[1]
@@ -91,7 +97,7 @@ class Group:
     def update(self, **kwargs) -> None:
         for _particle in self.__particles:
             _particle.update(kwargs)
-            if _particle.alpha == 0:
+            if _particle.expired:
                 self.__particles.remove(_particle)
                 del _particle
 

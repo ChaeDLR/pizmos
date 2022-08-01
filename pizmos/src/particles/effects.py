@@ -66,23 +66,29 @@ def explosion(start_position: Vector2 | tuple | list) -> ParticleGroup:
     return ParticleGroup(particles)
 
 
-def blip(start_position: Vector2 | tuple | list, color: tuple | list) -> ParticleGroup:
+def blip(
+    start_position: Vector2 | tuple | list, color: tuple | list = (100, 100, 100, 250)
+) -> ParticleGroup:
     class _Particle(Particle):
         transform_rate: int = 1
 
-        def update(self, mouse_pos: Vector2 | tuple = (0, 0)):
-            self.center = mouse_pos
+        def update(self, kwargs: dict) -> None:
+            """transform particle
+
+            Args:
+                mouse_pos (Vector2 | tuple, optional): Defaults to (0, 0).
+            """
+            self.center = kwargs.get("mouse_pos", (1, 1))
             self.radius += self.transform_rate
             if self.radius > 5:
                 self.transform_rate -= 1
-            elif self.radius < 1:
-                del self
 
     return ParticleGroup(
-        [_Particle(color, start_position, (0, 0), (i + 1))] for i in range(3)
+        [_Particle(color, start_position, (0, 0), (i)) for i in range(1, 4)]
     )
 
 
+#### pygame loop used for testing effects ####
 if __name__ == "__main__":
     import pygame
 
@@ -102,7 +108,10 @@ if __name__ == "__main__":
             self.name = self.get_particles.__name__
 
     #### Add new effects for testing here ####
-    _effects: list[_Effect] = [_Effect(get_particles=explosion)]
+    _effects: list[_Effect] = [
+        _Effect(get_particles=explosion),
+        _Effect(get_particles=blip),
+    ]
 
     # region set display
     pygame.display.init()
@@ -162,7 +171,7 @@ if __name__ == "__main__":
 
     # endregion
 
-    # stores rects of areas that should be updates in the window
+    # stores rects of areas that should be updated in the window
     updates: list[pygame.Rect] = []
 
     # stores live particles
@@ -180,6 +189,8 @@ if __name__ == "__main__":
 
             elif event.type == pygame.MOUSEMOTION:
                 for _effect in _effects:
+
+                    # check for effects selection
                     if _effect.text_rect.collidepoint(event.pos):
 
                         # set the previous active effect to nonselect
