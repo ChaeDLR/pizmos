@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, choice as rand_choice
 from pygame import Vector2
 
 if __name__ == "__main__":
@@ -39,7 +39,7 @@ def explosion(start_position: Vector2 | tuple | list) -> ParticleGroup:
         [randint(20, 230), randint(20, 230), randint(20, 230), 255] for _ in range(4)
     ]
 
-    velocity: int = 20
+    velocity: int = 24
 
     # this loop creates a new particle layer
     # color, radius, rate of change
@@ -64,6 +64,47 @@ def explosion(start_position: Vector2 | tuple | list) -> ParticleGroup:
             )
 
     return ParticleGroup(particles)
+
+
+def splat(start_position: Vector2 | tuple | list) -> ParticleGroup:
+
+    # modifiers for a particles (x, y) movement
+    # (-1) -> invert
+    # 0 -> zero out increment. Do not move across the axis
+    # 1 -> keep the default direction
+    directions: tuple[tuple[int, int]] = (
+        # left   # right # up     # down  # topleft
+        (-1, 0),
+        (1, 0),
+        (0, -1),
+        (0, 1),
+        (-1, -1),
+        # botleft# tpright#botright
+        (-1, 1),
+        (1, -1),
+        (1, 1),
+    )
+
+    colors: list[list[int]] = [
+        [randint(20, 230), randint(20, 230), randint(20, 230), 255] for _ in range(4)
+    ]
+
+    velocity: int = 20
+
+    return ParticleGroup(
+        [
+            Particle(
+                color=rand_choice(colors),
+                center=Vector2(start_position),
+                slope=(
+                    (direction[0] * velocity) * ((velocity / i) / velocity),
+                    (direction[1] * velocity) * ((velocity / i) / velocity),
+                ),
+                radius=i,
+            )
+            for i, direction in enumerate(directions, 1)
+        ]
+    )
 
 
 def blip(
@@ -111,6 +152,7 @@ if __name__ == "__main__":
     _effects: list[_Effect] = [
         _Effect(get_particles=explosion),
         _Effect(get_particles=blip),
+        _Effect(get_particles=splat),
     ]
 
     # region set display
