@@ -7,7 +7,7 @@ else:
     from .particle import Particle, group as ParticleGroup
 
 
-def explosion(start_position: Vector2) -> ParticleGroup:
+def explosion(start_position: Vector2 | tuple | list) -> ParticleGroup:
     """Creates Particle list with explosion slopes
 
     Args:
@@ -48,7 +48,7 @@ def explosion(start_position: Vector2) -> ParticleGroup:
         # get the percentage this particle's ROC should be
         # 100% = full speed
         # higher velocity and lower radius = faster particle movement and alpha ROC
-        roc_percentage: float = (velocity / i) / velocity  # try asking Hope
+        roc_percentage: float = (velocity / i) / velocity
 
         for direction in directions:
             particles.append(
@@ -66,6 +66,29 @@ def explosion(start_position: Vector2) -> ParticleGroup:
     return ParticleGroup(particles)
 
 
+def blip(
+    start_position: Vector2 | tuple | list, color: tuple | list = (100, 100, 100, 250)
+) -> ParticleGroup:
+    class _Particle(Particle):
+        transform_rate: int = 1
+
+        def update(self, kwargs: dict) -> None:
+            """transform particle
+
+            Args:
+                mouse_pos (Vector2 | tuple, optional): Defaults to (0, 0).
+            """
+            self.center = kwargs.get("mouse_pos", (1, 1))
+            self.radius += self.transform_rate
+            if self.radius > 5:
+                self.transform_rate -= 1
+
+    return ParticleGroup(
+        [_Particle(color, start_position, (0, 0), (i)) for i in range(1, 4)]
+    )
+
+
+#### pygame loop used for testing effects ####
 if __name__ == "__main__":
     import pygame
 
@@ -85,7 +108,10 @@ if __name__ == "__main__":
             self.name = self.get_particles.__name__
 
     #### Add new effects for testing here ####
-    _effects: list[_Effect] = [_Effect(get_particles=explosion)]
+    _effects: list[_Effect] = [
+        _Effect(get_particles=explosion),
+        _Effect(get_particles=blip),
+    ]
 
     # region set display
     pygame.display.init()
@@ -145,7 +171,7 @@ if __name__ == "__main__":
 
     # endregion
 
-    # stores rects of areas that should be updates in the window
+    # stores rects of areas that should be updated in the window
     updates: list[pygame.Rect] = []
 
     # stores live particles
@@ -163,6 +189,8 @@ if __name__ == "__main__":
 
             elif event.type == pygame.MOUSEMOTION:
                 for _effect in _effects:
+
+                    # check for effects selection
                     if _effect.text_rect.collidepoint(event.pos):
 
                         # set the previous active effect to nonselect
@@ -188,7 +216,7 @@ if __name__ == "__main__":
         updates.append(window.fill((5, 5, 5, 255)))
 
         for particle_group in particles:
-            particle_group.update()
+            particle_group.update(mouse_pos=pygame.mouse.get_pos())
             updates += particle_group.draw(window)
 
             # remove empty lists once all the particles have dissipated

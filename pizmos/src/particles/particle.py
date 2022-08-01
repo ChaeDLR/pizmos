@@ -1,17 +1,31 @@
-from dataclasses import dataclass
 from pygame import Vector2, Surface, draw
 
 
-@dataclass
 class Particle:
 
-    color: list[int, int, int, int]
-    center: Vector2
-    slope: tuple[int, int]
-    radius: float
+    color: list[int, int, int, int] = []
+    center: Vector2 = Vector2()
+    slope: tuple[int, int] = (0, 0)
+    radius: float = 1.0
 
-    def __post_init__(self):
+    def __init__(
+        self, color: list, center: Vector2 | tuple, slope: tuple | list, radius: float
+    ) -> None:
+        self.color = color
+        self.center = center
+        self.slope = slope
+        self.radius = radius
+
+        # the larger the particle the lower the dissipation rate
         self.__dissipation_rate: float = 6 / self.radius
+
+    # region properties
+
+    @property
+    def expired(self) -> bool:
+        if self.alpha == 0 or self.radius < 1:
+            return True
+        return False
 
     @property
     def alpha(self) -> int:
@@ -26,8 +40,19 @@ class Particle:
         else:
             self.color[3] = value
 
-    def update(self) -> None:
-        """update the particles values"""
+    @property
+    def dissipation_rate(self) -> float:
+        return self.__dissipation_rate
+
+    @dissipation_rate.setter
+    def dissipation_rate(self, value: float | int) -> None:
+        if value > 0:
+            self.__dissipation_rate = value
+
+    # endregion
+
+    def update(self, kwargs: dict) -> None:
+        """Update particle position and alpha values"""
         self.center.x += self.slope[0]
         self.center.y += self.slope[1]
 
@@ -36,11 +61,11 @@ class Particle:
 
 class Group:
 
-    __particles = []
     __update_rects = []
     __index = 0
+    __particles = None
 
-    def __init__(self, particles: list[Particle]):
+    def __init__(self, particles: list[Particle] = []):
         self.__particles = particles
 
     def __len__(self) -> int:
@@ -63,10 +88,16 @@ class Group:
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}({len(self.__particles)} particles)>"
 
-    def update(self) -> None:
+    def add(self, particle: Particle) -> None:
+        if isinstance(particle, Particle):
+            self.__particles.append(Particle)
+        else:
+            raise ValueError(f"{particle} is not an instance of Particle.")
+
+    def update(self, **kwargs) -> None:
         for _particle in self.__particles:
-            _particle.update()
-            if _particle.alpha == 0:
+            _particle.update(kwargs)
+            if _particle.expired:
                 self.__particles.remove(_particle)
                 del _particle
 
