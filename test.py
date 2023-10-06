@@ -3,7 +3,6 @@ import test
 
 
 if __name__ == "__main__":
-
     # region image tests
 
     test.image.load_all(pizmos.image.load_all)

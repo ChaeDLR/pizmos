@@ -24,7 +24,6 @@ def load_all(func: callable):
     inum = 0  # image number
 
     for _test_dir in dir_names:
-
         current_path = os.path.join(current_path, _test_dir)
 
         os.chdir(current_path)
@@ -43,7 +42,6 @@ def load_all(func: callable):
     # region delete the test dirs
 
     while current_path != head_dir:
-
         for _file in os.listdir(current_path):
             if os.path.isfile(_file):
                 os.remove(_file)

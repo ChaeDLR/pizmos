@@ -7,7 +7,9 @@ else:
     from .particle import Particle, group as ParticleGroup
 
 
-def explosion(start_position: Vector2 | tuple | list) -> ParticleGroup:
+def explosion(
+    start_position: Vector2 | tuple | list, colors: list[list[int, int, int, int]]
+) -> ParticleGroup:
     """Creates Particle list with explosion slopes
 
     Args:
@@ -35,16 +37,11 @@ def explosion(start_position: Vector2 | tuple | list) -> ParticleGroup:
         (1, 1),
     )
 
-    colors = [
-        [randint(20, 230), randint(20, 230), randint(20, 230), 255] for _ in range(4)
-    ]
-
     velocity: int = 24
 
     # this loop creates a new particle layer
     # color, radius, rate of change
     for i, color in enumerate(colors, 1):  # layer
-
         # get the percentage this particle's ROC should be
         # 100% = full speed
         # higher velocity and lower radius = faster particle movement and alpha ROC
@@ -66,8 +63,9 @@ def explosion(start_position: Vector2 | tuple | list) -> ParticleGroup:
     return ParticleGroup(particles)
 
 
-def splat(start_position: Vector2 | tuple | list) -> ParticleGroup:
-
+def splat(
+    start_position: Vector2 | tuple | list, colors: list[list[int, int, int, int]]
+) -> ParticleGroup:
     # modifiers for a particles (x, y) movement
     # (-1) -> invert
     # 0 -> zero out increment. Do not move across the axis
@@ -85,30 +83,27 @@ def splat(start_position: Vector2 | tuple | list) -> ParticleGroup:
         (1, 1),
     )
 
-    colors: list[list[int]] = [
-        [randint(20, 230), randint(20, 230), randint(20, 230), 255] for _ in range(4)
-    ]
-
     velocity: int = 20
+    pgroup = []
+    for i in range(1, 10):
+        _dir = rand_choice(directions)
 
-    return ParticleGroup(
-        [
+        pgroup.append(
             Particle(
-                color=rand_choice(colors),
-                center=Vector2(start_position),
-                slope=(
-                    (direction[0] * velocity) * ((velocity / i) / velocity),
-                    (direction[1] * velocity) * ((velocity / i) / velocity),
+                rand_choice(colors),
+                start_position,
+                (
+                    (_dir[0] * velocity) * ((velocity / i) / velocity),
+                    (_dir[1] * velocity) * ((velocity / i) / velocity),
                 ),
-                radius=i,
+                randint(1, 8),
             )
-            for i, direction in enumerate(directions, 1)
-        ]
-    )
+        )
+    return ParticleGroup(pgroup)
 
 
 def blip(
-    start_position: Vector2 | tuple | list, color: tuple | list = (100, 100, 100, 250)
+    start_position: Vector2 | tuple | list, color: list = (100, 100, 100, 250)
 ) -> ParticleGroup:
     class _Particle(Particle):
         transform_rate: int = 1
@@ -142,17 +137,29 @@ if __name__ == "__main__":
         text_rect: pygame.Rect = None
 
         get_particles: callable = None
+        get_arg: callable = None
 
         def __init__(self, **kwargs):
             for key, value in kwargs.items():
                 setattr(self, key, value)
             self.name = self.get_particles.__name__
 
+    def get_colors() -> list[list[int, int, int, int]]:
+        """Get a list of four random colors"""
+        return [
+            [randint(20, 230), randint(20, 230), randint(20, 230), 255]
+            for _ in range(4)
+        ]
+
+    def get_color() -> list[int, int, int, int]:
+        """Get a single color"""
+        return [randint(20, 230), randint(20, 230), randint(20, 230), 255]
+
     #### Add new effects for testing here ####
     _effects: list[_Effect] = [
-        _Effect(get_particles=explosion),
-        _Effect(get_particles=blip),
-        _Effect(get_particles=splat),
+        _Effect(get_particles=explosion, get_arg=get_colors),
+        _Effect(get_particles=blip, get_arg=get_color),
+        _Effect(get_particles=splat, get_arg=get_colors),
     ]
 
     # region set display
@@ -231,10 +238,8 @@ if __name__ == "__main__":
 
             elif event.type == pygame.MOUSEMOTION:
                 for _effect in _effects:
-
                     # check for effects selection
                     if _effect.text_rect.collidepoint(event.pos):
-
                         # set the previous active effect to nonselect
                         active_texts[active_index][0] = _effects[
                             active_index
@@ -249,7 +254,11 @@ if __name__ == "__main__":
                         ].select_text
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                particles.append(_effects[active_index].get_particles(event.pos))
+                particles.append(
+                    _effects[active_index].get_particles(
+                        event.pos, _effects[active_index].get_arg()
+                    )
+                )
 
         # endregion
 

@@ -2,17 +2,20 @@ from pygame import Vector2, Surface, draw
 
 
 class Particle:
-
     color: list[int, int, int, int] = []
     center: Vector2 = Vector2()
     slope: tuple[int, int] = (0, 0)
     radius: float = 1.0
 
     def __init__(
-        self, color: list, center: Vector2 | tuple, slope: tuple | list, radius: float
+        self,
+        color: list,
+        center: Vector2 | list | tuple,
+        slope: tuple | list,
+        radius: float,
     ) -> None:
         self.color = color
-        self.center = center
+        self.center = list(center)
         self.slope = slope
         self.radius = radius
 
@@ -53,14 +56,13 @@ class Particle:
 
     def update(self, kwargs: dict) -> None:
         """Update particle position and alpha values"""
-        self.center.x += self.slope[0]
-        self.center.y += self.slope[1]
+        self.center[0] += self.slope[0]
+        self.center[1] += self.slope[1]
 
         self.alpha -= self.__dissipation_rate
 
 
 class Group:
-
     __update_rects = []
     __index = 0
     __particles = None
@@ -102,7 +104,6 @@ class Group:
                 del _particle
 
     def draw(self, window: Surface) -> None:
-
         self.__update_rects.clear()
 
         for _particle in self.__particles:

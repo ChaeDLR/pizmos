@@ -19,7 +19,7 @@ def get_subimages(sheet: pygame.Surface) -> list[pygame.Surface]:
     _mask = pygame.mask.from_surface(sheet, threshold=174)
     _images = list()
 
-    for (surf, rect) in [
+    for surf, rect in [
         (
             pygame.Surface(
                 _rect.size,
@@ -92,11 +92,9 @@ def load_all(path: str, imgs_dict: dict = {}) -> dict:
     for _file in os.listdir(path):
         _cpath = os.path.join(path, _file)
         if os.path.isdir(_cpath):
-
             load_all(os.path.abspath(os.path.join(path, _file)), imgs_dict)
 
         elif os.path.isfile(_cpath):
-
             imgs_dict[_file.split(".")[0]] = pygame.image.load(
                 os.path.join(path, _file)
             )
