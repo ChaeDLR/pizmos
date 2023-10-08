@@ -2,8 +2,40 @@ import pygame
 import os
 
 
+def get_image_at(
+    rect: pygame.Rect | tuple[int, int, int, int],
+    sheet: pygame.Surface,
+    colorkey: tuple = None,
+    scale: tuple = None,
+) -> pygame.Surface:
+    """Capture image from given file at the given rect.
+    Optionally set transparancy colorkey and scale
+
+    Args:
+        rectangle (tuple): position, width, height of image
+        filepath (str): image file path
+        colorkey (tuple, optional): _description_. Defaults to None.
+        scale (tuple, optional): _description_. Defaults to None.
+
+    Returns:
+        pygame.Surface: _description_
+    """
+    # Loads image from x, y, x+offset, y+offset
+    if not isinstance(rect, pygame.Rect):
+        rect = pygame.Rect(rect)
+    image = pygame.Surface(rect.size).convert()
+    image.blit(sheet, (0, 0), rect)
+    if colorkey:
+        if colorkey == -1:
+            colorkey = image.get_at((0, 0))
+        image.set_colorkey(colorkey, pygame.RLEACCEL)
+    if scale:
+        return pygame.transform.scale(image, scale)
+    return image
+
+
 def get_subimages(sheet: pygame.Surface) -> list[pygame.Surface]:
-    """get subimages from a given surface
+    """Get subimages from a given surface using the given sheets transparancy colorkey.
 
     Args:
         sheet (pygame.Surface): Surface containing multiple images divided by a colorkey or the color at (0, 0)
@@ -86,7 +118,10 @@ def load_all(path: str, imgs_dict: dict = {}) -> dict:
 
     Args:
         path (str): Head directory
-        imgs_dict (dict): _description_
+        imgs_dict (dict): dictionary to add images to. Creates new one if None is passed.
+
+        Returns:
+            Dictionary where { key = image file name excluding extension, value = pygame.Surface }
     """
     _cpath = None
     for _file in os.listdir(path):
