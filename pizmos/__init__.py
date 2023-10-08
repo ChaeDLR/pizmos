@@ -8,4 +8,5 @@ __email__ = "delarosa.chae@gmail.com"
 __license__ = "Lesser General Public License"
 __copyright__ = "Copyright (C) 2022 Chae De La Rosa"
 
-from .src import particles, pixel, image
+from . import image, pixel
+from . import particles

@@ -55,7 +55,9 @@ class Particle:
     # endregion
 
     def update(self, kwargs: dict) -> None:
-        """Update particle position and alpha values"""
+        """Update particle position and alpha values
+        until self.expired returns true
+        """
         self.center[0] += self.slope[0]
         self.center[1] += self.slope[1]
 
@@ -97,6 +99,9 @@ class Group:
             raise ValueError(f"{particle} is not an instance of Particle.")
 
     def update(self, **kwargs) -> None:
+        """Call all particle update methods
+        and remove expired
+        """
         for _particle in self.__particles:
             _particle.update(kwargs)
             if _particle.expired:
@@ -104,6 +109,14 @@ class Group:
                 del _particle
 
     def draw(self, window: Surface) -> None:
+        """Draw all particles to given surface
+
+        Args:
+            window (Surface): target canvas
+
+        Returns:
+            None
+        """
         self.__update_rects.clear()
 
         for _particle in self.__particles:

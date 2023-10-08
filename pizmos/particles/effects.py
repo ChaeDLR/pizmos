@@ -1,4 +1,5 @@
 from random import randint, choice as rand_choice
+from math import pi
 from pygame import Vector2
 
 if __name__ == "__main__":
