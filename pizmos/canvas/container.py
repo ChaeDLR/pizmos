@@ -2,7 +2,6 @@ from pygame import Rect, Surface
 
 
 class CanvasContainer:
-
     rect: Rect = None
 
     # static and dynamic component containers
@@ -33,10 +32,7 @@ class CanvasContainer:
             component.update(): method to update component variables
         """
         for component in new_components:
-            if not (
-                hasattr(component, "image")
-                and hasattr(component, "rect")
-            ):
+            if not (hasattr(component, "image") and hasattr(component, "rect")):
                 raise Exception(
                     f"Component: {component}\nDoes not have attr image and/or rect."
                 )

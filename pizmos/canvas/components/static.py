@@ -1,6 +1,6 @@
 """Components that do not update every cycle
 """
-from pygame import (Surface, Rect, font, transform)
+from pygame import Surface, Rect, font, transform
 
 
 class Button:
@@ -8,6 +8,7 @@ class Button:
     Collision: self.rect.collidepoint((x,y))
     Animate: set and reset alpha
     """
+
     image: Surface = None
     rec: Rect = None
 
@@ -23,7 +24,7 @@ class Button:
         button_text: str,
         font_size: int,
         name: str = None,
-        **kwargs
+        **kwargs,
     ):
         """Initialize button settings"""
         self.__image_base = image
@@ -43,7 +44,7 @@ class Button:
     def __str__(self) -> str:
         return self.name
 
-    def resize(self, nrect: Rect | tuple[int,int]) -> None:
+    def resize(self, nrect: Rect | tuple[int, int]) -> None:
         """Resize the button
 
         Args:
@@ -71,8 +72,7 @@ class Button:
         self.msg_image.set_alpha(_i)
 
     def reveal(self) -> None:
-        """Make button completely visible
-        """
+        """Make button completely visible"""
         self.set_alpha(255)
         self.msg_image.set_alpha(255)
 
