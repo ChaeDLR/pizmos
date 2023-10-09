@@ -15,13 +15,9 @@ class ParallaxBackground:
         # 0 index in list=first_drawn = frontloaded
         # final index in list=last_drawn = backloaded
         # background layer group list
-        self.bg_layers: list = self.__load_bg_layers(
-            background
-        )
+        self.bg_layers: list = self.__load_bg_layers(background)
         # foreground layer group list
-        self.fg_layers: list = self.__load_fg_layers(
-            foreground
-        )
+        self.fg_layers: list = self.__load_fg_layers(foreground)
 
     def __load_bg_layers(
         self, background: dict, frontload: any = None, backload: any = None

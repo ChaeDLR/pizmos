@@ -2,7 +2,7 @@
 """
 
 from traceback import print_stack
-from pygame import (Surface, SRCALPHA, Rect, font)
+from pygame import Surface, SRCALPHA, Rect, font
 
 
 class ProgressBar:

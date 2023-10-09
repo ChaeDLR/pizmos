@@ -1,5 +1,5 @@
 from random import randint, choice as rand_choice
-from math import pi
+from math import pi, cos, sin
 from pygame import Vector2
 
 if __name__ == "__main__":
@@ -20,42 +20,26 @@ def explosion(
         list[Particle]: All the Particles that make up the effect
     """
     particles: list[Particle] = []
-
-    # modifiers for a particles (x, y) movement
-    # (-1) -> invert
-    # 0 -> zero out increment. Do not move across the axis
-    # 1 -> keep the default direction
-    directions: tuple[tuple[int, int]] = (
-        # left   # right # up     # down  # topleft
-        (-1, 0),
-        (1, 0),
-        (0, -1),
-        (0, 1),
-        (-1, -1),
-        # botleft# tpright#botright
-        (-1, 1),
-        (1, -1),
-        (1, 1),
-    )
-
-    velocity: int = 24
+    velocity: int = 7
 
     # this loop creates a new particle layer
     # color, radius, rate of change
-    for i, color in enumerate(colors, 1):  # layer
+    for i in range(2, 9):  # layer
         # get the percentage this particle's ROC should be
         # 100% = full speed
         # higher velocity and lower radius = faster particle movement and alpha ROC
         roc_percentage: float = (velocity / i) / velocity
+        for j in range(1, 9):
+            _r: float = ((2 * pi) / 9) * j
+            _dir = (cos(_r), sin(_r))
 
-        for direction in directions:
             particles.append(
                 Particle(
-                    color=color,
+                    rand_choice(colors),
                     center=Vector2(start_position),
                     slope=(
-                        (direction[0] * velocity) * roc_percentage,
-                        (direction[1] * velocity) * roc_percentage,
+                        (_dir[0] * velocity) * roc_percentage,
+                        (_dir[1] * velocity) * roc_percentage,
                     ),
                     radius=i,
                 )
@@ -67,39 +51,23 @@ def explosion(
 def splat(
     start_position: Vector2 | tuple | list, colors: list[list[int, int, int, int]]
 ) -> ParticleGroup:
-    # modifiers for a particles (x, y) movement
-    # (-1) -> invert
-    # 0 -> zero out increment. Do not move across the axis
-    # 1 -> keep the default direction
-    directions: tuple[tuple[int, int]] = (
-        # left   # right # up     # down  # topleft
-        (-1, 0),
-        (1, 0),
-        (0, -1),
-        (0, 1),
-        (-1, -1),
-        # botleft# tpright#botright
-        (-1, 1),
-        (1, -1),
-        (1, 1),
-    )
-
     velocity: int = 20
     pgroup = []
     for i in range(1, 10):
-        _dir = rand_choice(directions)
-
-        pgroup.append(
-            Particle(
-                rand_choice(colors),
-                start_position,
-                (
-                    (_dir[0] * velocity) * ((velocity / i) / velocity),
-                    (_dir[1] * velocity) * ((velocity / i) / velocity),
-                ),
-                randint(1, 8),
+        for j in range(1, 3):
+            _r: float = ((2 * pi) / randint(1, 32)) * randint(1, 32)
+            _dir = (cos(_r), sin(_r))
+            pgroup.append(
+                Particle(
+                    rand_choice(colors),
+                    start_position,
+                    (
+                        _dir[0] * ((velocity / i)) * j,
+                        _dir[1] * ((velocity / i)) * j,
+                    ),
+                    randint(1, 8),
+                )
             )
-        )
     return ParticleGroup(pgroup)
 
 
