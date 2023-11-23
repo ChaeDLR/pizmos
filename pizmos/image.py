@@ -1,13 +1,15 @@
-import pygame
 import os
 
+from pygame import Rect, Surface, transform, mask, rect
+from pygame import image as pgimage
+from pygame import RLEACCEL, BLEND_ALPHA_SDL2, SRCALPHA
 
 def get_image_at(
-    rect: pygame.Rect | tuple[int, int, int, int],
-    sheet: pygame.Surface,
+    rect: Rect | tuple[int, int, int, int],
+    sheet: Surface,
     colorkey: tuple = None,
     scale: tuple = None,
-) -> pygame.Surface:
+) -> Surface:
     """Capture image from given file at the given rect.
     Optionally set transparancy colorkey and scale
 
@@ -21,20 +23,20 @@ def get_image_at(
         pygame.Surface: _description_
     """
     # Loads image from x, y, x+offset, y+offset
-    if not isinstance(rect, pygame.Rect):
-        rect = pygame.Rect(rect)
-    image = pygame.Surface(rect.size).convert()
+    if not isinstance(rect, Rect):
+        rect = Rect(rect)
+    image = Surface(rect.size).convert()
     image.blit(sheet, (0, 0), rect)
     if colorkey:
         if colorkey == -1:
             colorkey = image.get_at((0, 0))
-        image.set_colorkey(colorkey, pygame.RLEACCEL)
+        image.set_colorkey(colorkey, RLEACCEL)
     if scale:
-        return pygame.transform.scale(image, scale)
+        return transform.scale(image, scale)
     return image
 
 
-def get_subimages(sheet: pygame.Surface) -> list[pygame.Surface]:
+def get_subimages(sheet: Surface) -> list[Surface]:
     """Get subimages from a given surface using the given sheets transparancy colorkey.
 
     Args:
@@ -48,14 +50,14 @@ def get_subimages(sheet: pygame.Surface) -> list[pygame.Surface]:
         _colorkey = sheet.get_at((0, 0))
 
     _colorkey = sheet.get_colorkey() if sheet.get_colorkey() else sheet.get_at((0, 0))
-    _mask = pygame.mask.from_surface(sheet, threshold=174)
+    _mask = mask.from_surface(sheet, threshold=174)
     _images = list()
 
     for surf, rect in [
         (
-            pygame.Surface(
+            Surface(
                 _rect.size,
-                flags=pygame.BLEND_ALPHA_SDL2 | pygame.SRCALPHA,
+                flags=BLEND_ALPHA_SDL2 | SRCALPHA,
             ),
             _rect,
         )
@@ -67,7 +69,7 @@ def get_subimages(sheet: pygame.Surface) -> list[pygame.Surface]:
     return _images
 
 
-def trim(image: pygame.Surface) -> pygame.Surface:
+def trim(image: Surface) -> Surface:
     """Remove as much of the colorkey as possible
 
     Args:
@@ -77,17 +79,17 @@ def trim(image: pygame.Surface) -> pygame.Surface:
         pygame.Surface
     """
     _img = image
-    _mask: pygame.mask.Mask = pygame.mask.from_surface(_img)
-    _rect: pygame.rect.Rect = _mask.get_bounding_rects()[0]
-    image = pygame.Surface(_rect.size, flags=pygame.BLEND_ALPHA_SDL2)
+    _mask: mask.Mask = mask.from_surface(_img)
+    _rect: rect.Rect = _mask.get_bounding_rects()[0]
+    image = Surface(_rect.size, flags=BLEND_ALPHA_SDL2)
     image.blit(_img, (0, 0), area=_rect)
     image.set_colorkey(image.get_at((0, 0)))
     return image
 
 
 def cut_sheet(
-    sheet: pygame.Surface, grid: tuple | list, margins: tuple | list = (0, 0, 0, 0)
-) -> list[pygame.Surface]:
+    sheet: Surface, grid: tuple | list, margins: tuple | list = (0, 0, 0, 0)
+) -> list[Surface]:
     """cut the spritesheet by the given dimensions
 
     Args:
@@ -104,9 +106,9 @@ def cut_sheet(
     cut_buttons = []
     for column in [int(img_width * i + margins[3]) for i in range(grid[0])]:
         for row in [int(img_height * j + margins[0]) for j in range(grid[1])]:
-            new_button = pygame.Surface((img_width, img_height))
+            new_button = Surface((img_width, img_height))
             new_button.blit(sheet, (0, 0), area=[column, row, img_width, img_height])
-            new_button = pygame.transform.scale(new_button, (250, 150))
+            new_button = transform.scale(new_button, (250, 150))
             new_button.set_colorkey(new_button.get_at((0, 0)))
             cut_buttons.append(new_button)
     return cut_buttons
@@ -130,7 +132,7 @@ def load_all(path: str, imgs_dict: dict = {}) -> dict:
             load_all(os.path.abspath(os.path.join(path, _file)), imgs_dict)
 
         elif os.path.isfile(_cpath):
-            imgs_dict[_file.split(".")[0]] = pygame.image.load(
+            imgs_dict[_file.split(".")[0]] = pgimage.load(
                 os.path.join(path, _file)
             )
 
