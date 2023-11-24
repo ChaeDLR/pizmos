@@ -1,2 +1,2 @@
 from .container import *
-import components
+from .components import *

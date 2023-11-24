@@ -1,2 +1,2 @@
-import dynamic
-import static
+from .dynamic import *
+from .static import *

@@ -4,7 +4,7 @@ from pygame import Surface, Rect, font, transform
 
 
 class Button:
-    """
+    """Static
     Collision: self.rect.collidepoint((x,y))
     Animate: set and reset alpha
     """

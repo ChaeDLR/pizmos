@@ -6,7 +6,9 @@ from pygame import Surface, SRCALPHA, Rect, font
 
 
 class ProgressBar:
-    """Base class for a dynamic bar ui element"""
+    """Dynamic
+    Bar ui element
+    """
 
     image: Surface = None
     rect: Rect = None
@@ -89,6 +91,17 @@ class ProgressBar:
 
 
 class TextSurface:
+    """Dynamic
+    Text Surface
+
+    Raises:
+        Exception: _description_
+        Exception: _description_
+        Exception: _description_
+
+    Returns:
+        _type_: _description_
+    """
     image: Surface = None
     rect: Rect = None
 
