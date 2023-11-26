@@ -42,5 +42,5 @@ class CanvasContainer:
                 self.__static_com.append(component)
 
     def update(self) -> None:
-        for _com in self.__dynamic_comp:
+        for _com in self.__dynamic_com:
             _com.update()
