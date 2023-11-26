@@ -1,2 +1,2 @@
-from .container import *
+from .container import CanvasContainer
 from .components import *

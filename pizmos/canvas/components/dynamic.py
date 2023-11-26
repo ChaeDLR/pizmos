@@ -102,6 +102,7 @@ class TextSurface:
     Returns:
         _type_: _description_
     """
+
     image: Surface = None
     rect: Rect = None
 

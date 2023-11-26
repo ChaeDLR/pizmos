@@ -2,6 +2,18 @@ from pygame import Vector2, Surface, draw
 
 
 class Particle:
+    """Particle class
+    color: rgba,
+    center: (x, y),
+    slope: (0, 0),
+    radius: float, r >= 1
+
+    Usage:
+        while 1:
+            particle.update()
+            draw(particle)
+    """
+
     color: list[int, int, int, int] = []
     center: Vector2 = Vector2()
     slope: tuple[int, int] = (0, 0)
@@ -65,6 +77,14 @@ class Particle:
 
 
 class Group:
+    """Contain and manage groups of particles
+
+    Raises:
+        StopIteration: __next__
+        ValueError: self.add(), only accept Particle type
+
+    """
+
     __update_rects = []
     __index = 0
     __particles = None

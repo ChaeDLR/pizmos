@@ -4,6 +4,7 @@ from pygame import Rect, Surface, transform, mask, rect
 from pygame import image as pgimage
 from pygame import RLEACCEL, BLEND_ALPHA_SDL2, SRCALPHA
 
+
 def get_image_at(
     rect: Rect | tuple[int, int, int, int],
     sheet: Surface,
@@ -132,8 +133,6 @@ def load_all(path: str, imgs_dict: dict = {}) -> dict:
             load_all(os.path.abspath(os.path.join(path, _file)), imgs_dict)
 
         elif os.path.isfile(_cpath):
-            imgs_dict[_file.split(".")[0]] = pgimage.load(
-                os.path.join(path, _file)
-            )
+            imgs_dict[_file.split(".")[0]] = pgimage.load(os.path.join(path, _file))
 
     return imgs_dict

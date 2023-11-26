@@ -5,7 +5,7 @@ from pygame import Vector2
 if __name__ == "__main__":
     from particle import Particle, Group as ParticleGroup
 else:
-    from .particle import Particle, group as ParticleGroup
+    from .particle import Particle, Group as ParticleGroup
 
 
 def explosion(
