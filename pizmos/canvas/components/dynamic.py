@@ -46,8 +46,7 @@ class ProgressBar:
 
         self.set_percentage_cb(percentage_cb, True)
 
-
-    def set_percentage_cb(self, percentage_cb: callable, init_pb: bool=False) -> None:
+    def set_percentage_cb(self, percentage_cb: callable, init_pb: bool = False) -> None:
         """Set the call back function that returns a value from [0.0, 1.0]
         that represents the peercentage of the bar that should be displayed
 
@@ -83,16 +82,10 @@ class ProgressBar:
         self.image.fill(self.base_color)
         try:
             _img = Surface(
-                ((self.size[0] * self.__percentage) - 20, self.rect.height - 10)
+                ((self.size[0] * self.__percentage), self.rect.height)
             ).convert()
             _img.fill(self.color)
-            self.image.blit(
-            _img,
-            (
-                self.rect.x,
-                self.rect.y - 5,
-            ),
-        )
+            self.image.blit(_img, (0, 0))
         except:
             print(f"ERROR: Invalid size -> {self.size}.", file=stderr)
 
