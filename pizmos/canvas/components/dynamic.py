@@ -130,6 +130,8 @@ class TextSurface:
                 f"Invalid callable: {text_update_cb}\nExpected return value of type string."
             )
 
+        self.update()
+
     def __create_text(self, x_y: tuple) -> tuple[Surface, Rect]:
         """
         x_y: tuple -> positions using center of the rect
