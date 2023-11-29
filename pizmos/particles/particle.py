@@ -1,4 +1,20 @@
-from pygame import Vector2, Surface, draw
+from pygame import Vector2, Surface, draw, Rect
+from numpy import ndarray
+
+from traceback import print_stack
+from sys import stderr
+
+"""
+A = np.ones((2, 2))
+B = np.eye(2, 2)
+C = np.zeros((2, 2))
+D = np.diag((-3, -4))
+np.block([[A, B], [C, D]])
+array([[ 1.,  1.,  1.,  0.],
+       [ 1.,  1.,  0.,  1.],
+       [ 0.,  0., -3.,  0.],
+       [ 0.,  0.,  0., -4.]])
+"""
 
 
 class Particle:
@@ -25,14 +41,18 @@ class Particle:
         center: Vector2 | list | tuple,
         slope: tuple | list,
         radius: float,
+        dissipation_rate: float = None,
     ) -> None:
-        self.color = color
+        self.color = list(color)
         self.center = list(center)
         self.slope = slope
         self.radius = radius
 
         # the larger the particle the lower the dissipation rate
-        self.__dissipation_rate: float = 6 / self.radius
+        if dissipation_rate:
+            self.__dissipation_rate: float = 255 * dissipation_rate
+        else:
+            self.__dissipation_rate = 6 / self.radius
 
     # region properties
 
@@ -72,7 +92,6 @@ class Particle:
         """
         self.center[0] += self.slope[0]
         self.center[1] += self.slope[1]
-
         self.alpha -= self.__dissipation_rate
 
 
@@ -83,14 +102,19 @@ class Group:
         StopIteration: __next__
         ValueError: self.add(), only accept Particle type
 
+    Example:
+        effect: ParticleGroup = pizmos.effects.blip(**kwargs)
+        effect.update()
+        update_rects = effect.draw(window)
+        pygme.display.update(update_rects)
     """
 
-    __update_rects = []
     __index = 0
-    __particles = None
+    # start with 10 rows with 10 cols each until more space is needed
+    __particles: list = []
 
     def __init__(self, particles: list[Particle] = []):
-        self.__particles = particles
+        self.__particles = list(particles)
 
     def __len__(self) -> int:
         return len(self.__particles)
@@ -99,6 +123,7 @@ class Group:
         return bool(self.__particles)
 
     def __iter__(self):
+        # TODO: this might return the wrong value
         return self
 
     def __next__(self) -> Particle:
@@ -120,7 +145,7 @@ class Group:
 
     def update(self, **kwargs) -> None:
         """Call all particle update methods
-        and remove expired
+        and remove expired.
         """
         for _particle in self.__particles:
             _particle.update(kwargs)
@@ -128,24 +153,26 @@ class Group:
                 self.__particles.remove(_particle)
                 del _particle
 
-    def draw(self, window: Surface) -> None:
+    def draw(self, window: Surface) -> list[Rect]:
         """Draw all particles to given surface
 
         Args:
             window (Surface): target canvas
 
         Returns:
-            None
+            iterable of rects that need to be updated
+            by pygame.display.update(rects)
         """
-        self.__update_rects.clear()
-
-        for _particle in self.__particles:
-            self.__update_rects.append(
+        try:
+            return [
                 draw.circle(
                     surface=window,
                     color=_particle.color,
                     center=_particle.center,
                     radius=_particle.radius,
                 )
-            )
-        return self.__update_rects
+                for _particle in self.__particles
+            ]
+        except ValueError as ex:
+            print_stack(file=stderr)
+            raise ex

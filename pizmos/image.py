@@ -1,8 +1,10 @@
 import os
 
-from pygame import Rect, Surface, transform, mask, rect
+from pygame import Rect, Surface, transform, mask, rect, surfarray
 from pygame import image as pgimage
 from pygame import RLEACCEL, BLEND_ALPHA_SDL2, SRCALPHA
+
+from numpy import uint8
 
 
 def get_image_at(
@@ -136,3 +138,19 @@ def load_all(path: str, imgs_dict: dict = {}) -> dict:
             imgs_dict[_file.split(".")[0]] = pgimage.load(os.path.join(path, _file))
 
     return imgs_dict
+
+
+def get_sprite_colors(img: Surface) -> tuple:
+    """
+    Loop through a surface and grab the colors its made of
+    sort from lightest(n) to darkest(0)
+    """
+    colors: list = []
+    rgb: list = None
+    for row in surfarray.array3d(img):
+        for pixel in row:
+            rgb = [int(pixel[0]), int(pixel[1]), int(pixel[2]), 255]
+            if rgb not in [[255, 255, 255, 255], [0, 0, 0, 255]] + colors:
+                colors.append(rgb)
+    colors.sort(key=sum)
+    return tuple(colors)

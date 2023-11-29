@@ -7,9 +7,15 @@ if __name__ == "__main__":
 else:
     from .particle import Particle, Group as ParticleGroup
 
+# TODO:
+# 1. scale effects
+
 
 def explosion(
-    start_position: Vector2 | tuple | list, colors: list[list[int, int, int, int]]
+    start_position: Vector2 | tuple | list,
+    colors: list[list[int, int, int, int]],
+    speed: int = 14,
+    dissipation_rate: float = 0.18,
 ) -> ParticleGroup:
     """Creates Particle list with explosion slopes
 
@@ -19,16 +25,16 @@ def explosion(
     Returns:
         list[Particle]: All the Particles that make up the effect
     """
+    # TODO: particle tails are too long
     particles: list[Particle] = []
-    velocity: int = 7
 
     # this loop creates a new particle layer
     # color, radius, rate of change
-    for i in range(2, 9):  # layer
+    for i in range(4, 9):  # layer
         # get the percentage this particle's ROC should be
         # 100% = full speed
         # higher velocity and lower radius = faster particle movement and alpha ROC
-        roc_percentage: float = (velocity / i) / velocity
+        roc_percentage: float = (speed / i) / speed
         for j in range(1, 9):
             _r: float = ((2 * pi) / 9) * j
             _dir = (cos(_r), sin(_r))
@@ -38,10 +44,11 @@ def explosion(
                     rand_choice(colors),
                     center=Vector2(start_position),
                     slope=(
-                        (_dir[0] * velocity) * roc_percentage,
-                        (_dir[1] * velocity) * roc_percentage,
+                        (_dir[0] * speed) * roc_percentage,
+                        (_dir[1] * speed) * roc_percentage,
                     ),
                     radius=i,
+                    dissipation_rate=dissipation_rate,
                 )
             )
 
