@@ -18,14 +18,13 @@ def explosion(
     dissipation_rate: float = 0.18,
 ) -> ParticleGroup:
     """Creates Particle list with explosion slopes
-
+    Randomly chooses from color list
     Args:
         start_position (Vector2): x and y values
 
     Returns:
         list[Particle]: All the Particles that make up the effect
     """
-    # TODO: particle tails are too long
     particles: list[Particle] = []
 
     # this loop creates a new particle layer

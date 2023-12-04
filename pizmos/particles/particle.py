@@ -1,5 +1,4 @@
 from pygame import Vector2, Surface, draw, Rect
-from numpy import ndarray
 
 from traceback import print_stack
 from sys import stderr
@@ -44,6 +43,8 @@ class Particle:
         dissipation_rate: float = None,
     ) -> None:
         self.color = list(color)
+        if len(self.color) < 4:
+            self.color.append(255)
         self.center = list(center)
         self.slope = slope
         self.radius = radius
@@ -86,7 +87,7 @@ class Particle:
 
     # endregion
 
-    def update(self, kwargs: dict) -> None:
+    def update(self, **kwargs: dict) -> None:
         """Update particle position and alpha values
         until self.expired returns true
         """
@@ -148,7 +149,7 @@ class Group:
         and remove expired.
         """
         for _particle in self.__particles:
-            _particle.update(kwargs)
+            _particle.update(**kwargs)
             if _particle.expired:
                 self.__particles.remove(_particle)
                 del _particle
