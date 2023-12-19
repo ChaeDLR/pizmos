@@ -3,13 +3,13 @@ from math import pi, cos, sin
 from pygame import Vector2
 
 if __name__ == "__main__":
-    from particle import Particle, Group as ParticleGroup
+    from particle import Particle, ParticleGroup
 else:
-    from .particle import Particle, Group as ParticleGroup
+    from .particle import Particle, ParticleGroup
 
 
 def explosion(
-    start_position: Vector2 | tuple | list, colors: list[list[int, int, int, int]]
+    start_position: Vector2 | tuple | list, colors: list[list[int, int, int, int]], velocity: int | float=7
 ) -> ParticleGroup:
     """Creates Particle list with explosion slopes
 
@@ -20,7 +20,7 @@ def explosion(
         list[Particle]: All the Particles that make up the effect
     """
     particles: list[Particle] = []
-    velocity: int = 7
+    _velocity: int = float(velocity)
 
     # this loop creates a new particle layer
     # color, radius, rate of change
@@ -28,7 +28,7 @@ def explosion(
         # get the percentage this particle's ROC should be
         # 100% = full speed
         # higher velocity and lower radius = faster particle movement and alpha ROC
-        roc_percentage: float = (velocity / i) / velocity
+        roc_percentage: float = (_velocity / i) / _velocity
         for j in range(1, 9):
             _r: float = ((2 * pi) / 9) * j
             _dir = (cos(_r), sin(_r))
@@ -38,10 +38,11 @@ def explosion(
                     rand_choice(colors),
                     center=Vector2(start_position),
                     slope=(
-                        (_dir[0] * velocity) * roc_percentage,
-                        (_dir[1] * velocity) * roc_percentage,
+                        (_dir[0] * _velocity) * roc_percentage,
+                        (_dir[1] * _velocity) * roc_percentage,
                     ),
                     radius=i,
+                    dissipation_rate=12.4
                 )
             )
 
@@ -49,9 +50,9 @@ def explosion(
 
 
 def splat(
-    start_position: Vector2 | tuple | list, colors: list[list[int, int, int, int]]
+    start_position: Vector2 | tuple | list, colors: list[list[int, int, int, int]], velocity: int | float=20
 ) -> ParticleGroup:
-    velocity: int = 20
+    _velocity = float(velocity)
     pgroup = []
     for i in range(1, 10):
         for j in range(1, 3):
@@ -62,8 +63,8 @@ def splat(
                     rand_choice(colors),
                     start_position,
                     (
-                        _dir[0] * ((velocity / i)) * j,
-                        _dir[1] * ((velocity / i)) * j,
+                        _dir[0] * ((_velocity / i)) * j,
+                        _dir[1] * ((_velocity / i)) * j,
                     ),
                     randint(1, 8),
                 )

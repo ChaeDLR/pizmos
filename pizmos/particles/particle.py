@@ -1,4 +1,5 @@
 from pygame import Vector2, Surface, draw
+from numpy import ndarray, array
 
 
 class Particle:
@@ -25,14 +26,17 @@ class Particle:
         center: Vector2 | list | tuple,
         slope: tuple | list,
         radius: float,
+        dissipation_rate:float=None
     ) -> None:
-        self.color = color
+        self.color = [0,0,0,255]
+        for i, _c in enumerate(color):
+            self.color[i] = _c
         self.center = list(center)
         self.slope = slope
         self.radius = radius
 
         # the larger the particle the lower the dissipation rate
-        self.__dissipation_rate: float = 6 / self.radius
+        self.__dissipation_rate: float = dissipation_rate if dissipation_rate else 20 / self.radius
 
     # region properties
 
@@ -76,7 +80,7 @@ class Particle:
         self.alpha -= self.__dissipation_rate
 
 
-class Group:
+class ParticleGroup:
     """Contain and manage groups of particles
 
     Raises:
@@ -87,13 +91,18 @@ class Group:
 
     __update_rects = []
     __index = 0
-    __particles = None
+    __particles: list = []
+    __size: int = 10
 
     def __init__(self, particles: list[Particle] = []):
-        self.__particles = particles
+        self.__particles = list(particles)
 
     def __len__(self) -> int:
-        return len(self.__particles)
+        """
+        Returns:
+            int: nparray.size
+        """
+        return self.__particles.size
 
     def __bool__(self) -> bool:
         return bool(self.__particles)
