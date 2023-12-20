@@ -9,7 +9,9 @@ else:
 
 
 def explosion(
-    start_position: Vector2 | tuple | list, colors: list[list[int, int, int, int]], velocity: int | float=7
+    start_position: Vector2 | tuple | list,
+    colors: list[list[int, int, int, int]],
+    velocity: int | float = 7,
 ) -> ParticleGroup:
     """Creates Particle list with explosion slopes
 
@@ -42,7 +44,7 @@ def explosion(
                         (_dir[1] * _velocity) * roc_percentage,
                     ),
                     radius=i,
-                    dissipation_rate=12.4
+                    dissipation_rate=12.4,
                 )
             )
 
@@ -50,7 +52,9 @@ def explosion(
 
 
 def splat(
-    start_position: Vector2 | tuple | list, colors: list[list[int, int, int, int]], velocity: int | float=20
+    start_position: Vector2 | tuple | list,
+    colors: list[list[int, int, int, int]],
+    velocity: int | float = 20,
 ) -> ParticleGroup:
     _velocity = float(velocity)
     pgroup = []

@@ -159,6 +159,7 @@ class TextSurface:
 
     def update(self) -> None:
         self.__text = self.__text_update_cb()
+        self.image.fill((0, 0, 0, 0))
         self.image = self.__text_font.render(self.__text, 1, self.__text_color)
         _pos = self.rect.center
         self.rect = self.image.get_rect()

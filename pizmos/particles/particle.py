@@ -26,9 +26,9 @@ class Particle:
         center: Vector2 | list | tuple,
         slope: tuple | list,
         radius: float,
-        dissipation_rate:float=None
+        dissipation_rate: float = None,
     ) -> None:
-        self.color = [0,0,0,255]
+        self.color = [0, 0, 0, 255]
         for i, _c in enumerate(color):
             self.color[i] = _c
         self.center = list(center)
@@ -36,7 +36,9 @@ class Particle:
         self.radius = radius
 
         # the larger the particle the lower the dissipation rate
-        self.__dissipation_rate: float = dissipation_rate if dissipation_rate else 20 / self.radius
+        self.__dissipation_rate: float = (
+            dissipation_rate if dissipation_rate else 20 / self.radius
+        )
 
     # region properties
 
